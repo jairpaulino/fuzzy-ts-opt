@@ -1,11 +1,11 @@
-rm(list = ls()) # Limpando dados
+rm(list = ls()) # Limpa dados
 
 # Bibliotecas requeridas
 library(forecast)
 library(AnalyzeTS) #Analisa series temporais fuzzy STF
 library(GA)
 
-# Chamando fun??es externas
+# Chamando funcoes externas
 source("Code/preProcessing.R")
 source("Code/fuzzyTS.R")
 source("Code/performanceMetrics.R")
@@ -15,10 +15,9 @@ source("Code/optimalArima.R")
 # MATAL; PIPVI; POPAZ
 dados = read.csv("Data/LYNX.csv", sep = ";"); head(dados)
 
-# Criando conjuntos de treinamento e teste
+# Cria conjuntos de treinamento e teste
 tamanho_dados = length(dados$target)
 percentual_train = 0.8
-#n = round(length(percentual_train)) corrigir o bug
 train.set = dados$target[1:round((tamanho_dados*percentual_train))] #plot.ts(train.set)
 test.set = dados$target[round((tamanho_dados*percentual_train+1)):tamanho_dados] #plot.ts(test.set)
 
