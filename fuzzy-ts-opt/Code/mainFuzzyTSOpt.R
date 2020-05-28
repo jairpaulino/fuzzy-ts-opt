@@ -21,7 +21,7 @@ percentual_train = 0.8
 train.set = dados$target[1:round((tamanho_dados*percentual_train))] #plot.ts(train.set)
 test.set = dados$target[round((tamanho_dados*percentual_train+1)):tamanho_dados] #plot.ts(test.set)
 
-# Calcula previsao 1-Step ahed para o modelo FTS
+# Calcula previsao 1-Step ahead para o modelo FTS
 begin_fuzzy = proc.time()
 GAParameters = getOptGAParameters()
 fuzzy_forecast = get1StepAheadFuzzyTS(train.set, test.set, GAParameters)

@@ -20,19 +20,21 @@ fitnessGA = function(C, n, w, pos_type, time_series = train.set){
 getOptGAParameters = function(){
 
   # c() - C, n, w, pos_type
-  lower = c(0, 02, 02, 1)
-  upper = c(1, 50, 12, 2)
+  lower = c(0, 05, 02, 1)
+  upper = c(1, 20, 12, 2)
   GA <- ga(type = "real-valued", 
            fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4]),
            lower = lower, upper = upper, 
            pcrossover = 0.9,
            pmutation = 0.1,
            popSize = 30,
-           maxiter = 30, 
+           maxiter = 10, 
            seed = 123)
-  plot(GA)
-  C = summary(GA)$solution[1]; n = round(summary(GA)$solution[2]) 
-  w = round(summary(GA)$solution[3]); pos_type = round(summary(GA)$solution[4]) 
+
+  #a = length(GA@solution) / 4
+  #summary(GA)$solution[1,][1]
+  C = summary(GA)$solution[1,][1]; n = round(summary(GA)$solution[1,][2]) 
+  w = round(summary(GA)$solution[1,][3]); pos_type = round(summary(GA)$solution[1,][4]) 
   result = c(C, n, w, pos_type)
   return(result)
 }
@@ -61,7 +63,7 @@ get1StepAheadFuzzyTS = function(train.set, test.set, GAParameters){
   for (i in 1:forecast_number){
    
     fts_forecast = getFuzzyTS(time_series_all, GAParameters) #cria modelo
-    fts_forecast_all[i] = as.numeric(fts_forecast) #transforma a previsão em valor númérico
+    fts_forecast_all[i] = as.numeric(fts_forecast) #transforma a previs?o em valor n?m?rico
     time_series_all = c(time_series_all, test.set[i]) #atualiza o vetor utilizado no calculo da previsao 
     print(c)
     c=c+1
