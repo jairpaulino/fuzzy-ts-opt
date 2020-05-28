@@ -1,12 +1,8 @@
 rm(list = ls()) # Limpando dados
 
-# Selecionando diretorio de trabalho
-#setwd("C:/Users/jairp/Dropbox/_Papers_Books/01_Artigos_em_andamento/Eduardo/Fuzzy/")
-#setwd('C:/Users/Eduardo/OneDrive - Instituto Leao Sampaio de Ensino Universitario Ltda/Artigos_2020/Banco de dados/Data_Tese/Fuzzy') 
-
 # Bibliotecas requeridas
 library(forecast)
-library(AnalyzeTS) #Analisa s?ries temporais fuzzy STF
+library(AnalyzeTS) #Analisa series temporais fuzzy STF
 library(GA)
 
 # Chamando fun??es externas
