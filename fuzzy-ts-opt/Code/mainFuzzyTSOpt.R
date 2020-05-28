@@ -17,7 +17,7 @@ dados = read.csv("Data/LYNX.csv", sep = ";"); head(dados)
 
 # Cria conjuntos de treinamento e teste
 tamanho_dados = length(dados$target)
-percentual_train = 0.85
+percentual_train = 0.8
 train.set = dados$target[1:round((tamanho_dados*percentual_train))] #plot.ts(train.set)
 test.set = dados$target[round((tamanho_dados*percentual_train+1)):tamanho_dados] #plot.ts(test.set)
 
