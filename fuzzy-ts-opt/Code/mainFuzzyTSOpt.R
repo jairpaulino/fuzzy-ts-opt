@@ -12,8 +12,8 @@ source("Code/performanceMetrics.R")
 source("Code/optimalArima.R")
 
 # Lendo dados
-# MATAL; PIPVI; POPAZ
-dados = read.csv("Data/LYNX.csv", sep = ";"); head(dados)
+# MATAL; PIBVI; POPAZ
+dados = read.csv("Data/PIBVI.csv", sep = ";"); head(dados)
 
 # Cria conjuntos de treinamento e teste
 tamanho_dados = length(dados$target)
