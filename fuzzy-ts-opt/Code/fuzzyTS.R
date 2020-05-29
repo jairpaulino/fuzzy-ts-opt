@@ -21,18 +21,18 @@ getOptGAParameters = function(){
 
   # c() - C, n, w, pos_type
   lower = c(0, 05, 02, 1)
-  upper = c(1, 20, 12, 2)
+  upper = c(1, 10, 10, 2)
   GA <- ga(type = "real-valued", 
            fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4]),
            lower = lower, upper = upper, 
            pcrossover = 0.9,
            pmutation = 0.1,
            popSize = 30,
-           maxiter = 10, 
+           maxiter = 30, 
            seed = 123)
+  
+  plot(GA)
 
-  #a = length(GA@solution) / 4
-  #summary(GA)$solution[1,][1]
   C = summary(GA)$solution[1,][1]; n = round(summary(GA)$solution[1,][2]) 
   w = round(summary(GA)$solution[1,][3]); pos_type = round(summary(GA)$solution[1,][4]) 
   result = c(C, n, w, pos_type)
