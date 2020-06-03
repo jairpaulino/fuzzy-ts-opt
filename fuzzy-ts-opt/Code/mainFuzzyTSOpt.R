@@ -9,11 +9,11 @@ library(GA)
 source("Code/preProcessing.R")
 source("Code/fuzzyTS.R")
 source("Code/performanceMetrics.R")
-source("Code/optimalArima.R")
+source("Code/otherModels.R")
 
 # Lendo dados
 # MATAL; PIBVI; POPAZ
-dados = read.csv("Data/PIBVI.csv", sep = ";"); head(dados)
+dados = read.csv("Data/LYNX.csv", sep = ";"); head(dados)
 
 # Cria conjuntos de treinamento e teste
 tamanho_dados = length(dados$target)
