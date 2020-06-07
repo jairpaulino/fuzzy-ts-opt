@@ -20,16 +20,16 @@ fitnessGA = function(C, n, w, pos_type, time_series = train.set){
 getOptGAParameters = function(){
 
   # c() - C, n, w, pos_type
-  lower = c(0, 05, 02, 1)
+  lower = c(0, 02, 02, 1)
   upper = c(1, 20, 10, 2)
   GA <- ga(type = "real-valued", 
            fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4]),
            lower = lower, upper = upper, 
            pcrossover = 0.9,
-           pmutation = 0.05,
-           popSize = 10,
-           maxiter = 10, 
-           seed = 156)
+           pmutation = 0.1,
+           popSize = 30,
+           maxiter = 30, 
+           seed = 22)
   
   plot(GA)
 
