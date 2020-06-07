@@ -13,13 +13,15 @@ source("Code/otherModels.R")
 
 # Lendo dados
 # MATAL; PIBVI; POPAZ
-dados = read.csv("Data/LYNX.csv", sep = ";"); head(dados)
+names = ("PIBPC")
+dados = read.csv("Data/PIBPC.csv", sep = ";"); head(dados)
 
 # Cria conjuntos de treinamento e teste
 tamanho_dados = length(dados$target)
-percentual_train = 0.8
-train.set = dados$target[1:round((tamanho_dados*percentual_train))] #plot.ts(train.set)
-test.set = dados$target[round((tamanho_dados*percentual_train+1)):tamanho_dados] #plot.ts(test.set)
+percentual_train = 0.75
+train.set = dados$target[1:round((tamanho_dados*percentual_train))] 
+test.set = dados$target[round((tamanho_dados*percentual_train+1)):tamanho_dados] 
+#plot.ts(train.set); plot.ts(test.set)
 
 # Calcula previsao 1-Step ahead para o modelo FTS
 begin_fuzzy = proc.time()
@@ -57,24 +59,25 @@ result_models$ann = ann_forecast
 
 result_models_metrics = as.data.frame(matrix(nrow = 3, ncol = 4))
 names(result_models_metrics) = c("fuzzy", "arima", "ets", "ann") 
-rownames(result_models_metrics) = c("MSE", "MAPE", "Theils' U")
+rownames(result_models_metrics) = c("MSE", "MAPE", "NRMSE")
 
 result_models_metrics[1, 1] = getMSE(result_models$obs, result_models$fuzzy)
 result_models_metrics[2, 1] = getMAPE(result_models$obs, result_models$fuzzy)
-result_models_metrics[3, 1] = getTheil(result_models$obs, result_models$fuzzy)
+result_models_metrics[3, 1] = getNRMSE(result_models$obs, result_models$fuzzy)
 
 result_models_metrics[1, 2] = getMSE(result_models$obs, result_models$arima)
 result_models_metrics[2, 2] = getMAPE(result_models$obs, result_models$arima)
-result_models_metrics[3, 2] = getTheil(result_models$obs, result_models$arima)
+result_models_metrics[3, 2] = getNRMSE(result_models$obs, result_models$arima)
 
 result_models_metrics[1, 3] = getMSE(result_models$obs, result_models$ets)
 result_models_metrics[2, 3] = getMAPE(result_models$obs, result_models$ets)
-result_models_metrics[3, 3] = getTheil(result_models$obs, result_models$ets)
+result_models_metrics[3, 3] = getNRMSE(result_models$obs, result_models$ets)
 
 result_models_metrics[1, 4] = getMSE(result_models$obs, result_models$ann)
 result_models_metrics[2, 4] = getMAPE(result_models$obs, result_models$ann)
-result_models_metrics[3, 4] = getTheil(result_models$obs, result_models$ann)
+result_models_metrics[3, 4] = getNRMSE(result_models$obs, result_models$ann)
 result_models_metrics
+
 
 # Cria grafico 
 plot.ts(test.set, lwd = 2)
@@ -93,3 +96,9 @@ result_models_time$arima = tempo_proc_arima[3]
 result_models_time$ets = tempo_proc_ets[3]
 result_models_time$ann = tempo_proc_ann[3]
 result_models_time
+
+sink(file = paste("Results/", names[1], "_prints.txt", sep=""))
+print(paste("> **************", names[1], "**************"))
+result_models_metrics
+result_models_time
+sink()
