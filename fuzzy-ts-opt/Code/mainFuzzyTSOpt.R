@@ -13,8 +13,8 @@ source("Code/otherModels.R")
 
 # Lendo dados
 # MATAL; PIBVI; POPAZ
-names = ("PIBPC")
-dados = read.csv("Data/PIBPC.csv", sep = ";"); head(dados)
+names = ("ONI")
+dados = read.csv("Data/ONI.csv", sep = ";"); head(dados)
 
 # Cria conjuntos de treinamento e teste
 tamanho_dados = length(dados$target)
