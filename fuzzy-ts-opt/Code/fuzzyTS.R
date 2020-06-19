@@ -1,12 +1,11 @@
-# Cria funcao fitness
-fitnessGA = function(C, n, w, pos_type, time_series = train.set){
-  #time_series = train.set; C = 0.7; n = 17.1; w = 5.3; pos_type = 1.2
+# Cria funcao fitness - GA
+fitnessGA = function(C, n, w, time_series = train.set){
+  #time_series = train.set; C = 0.7; n = 3; w = 2
   
-  C = round(C, 0); n = round(n, 0)
-  w = round(w, 0); pos_type = round(pos_type, 0)
-  type_alg = c("Abbasov-Mamedova","NFTS")
+  n = round(n, 0); w = round(w, 0)
   fuzzy1 = fuzzy.ts2(as.ts(time_series), 
-                     C = C, n = n, w = w, type = type_alg[pos_type], 
+                     C = C, n = n, w = w, 
+                     type = "Abbasov-Mamedova", 
                      forecast = 1)  
   
   matriz.previsao = as.data.frame(matrix(nrow = length(fuzzy1$interpolate), ncol = 2))
@@ -17,13 +16,15 @@ fitnessGA = function(C, n, w, pos_type, time_series = train.set){
   return(getMSE(matriz.previsao$obs, matriz.previsao$forecast))  
 }
 
+# Calcula os parametros - GA
 getOptGAParameters = function(){
-
+  #time_series = train.set; C = 0.5; n = 5.3; w = 6
+  
   # c() - C, n, w, pos_type
-  lower = c(0, 02, 02, 1)
-  upper = c(1, 20, 10, 2)
+  lower = c(0, 02, 02)
+  upper = c(1, 20, 10)
   GA <- ga(type = "real-valued", 
-           fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4]),
+           fitness =  function(x) -fitnessGA (x[1], x[2], x[3]),
            lower = lower, upper = upper, 
            pcrossover = 0.9,
            pmutation = 0.1,
@@ -39,6 +40,51 @@ getOptGAParameters = function(){
   return(result)
 }
 
+# Calcula os parametros - GenSA
+getOptGenSAParameters = function(){
+  # Cria funcao fitness - GenSA
+  fitnessGenSA = function(parameters, time_series = train.set){
+    #time_series = train.set; C = 0.5; n = 5.3; w = 6
+    
+    ftsParameters = list()
+    ftsParameters$C = floor(parameters[1])
+    ftsParameters$n = floor(parameters[2])
+    ftsParameters$w = floor(parameters[3])
+    
+    n = as.numeric(round(n, 0)); w = round(w, 0)
+    fuzzy1 = fuzzy.ts2(as.ts(time_series), 
+                       C = ftsParameters$C, n =  ftsParameters$n, w = ftsParameters$w, 
+                       type = "Abbasov-Mamedova", 
+                       forecast = 1)  
+    
+    matriz.previsao = as.data.frame(matrix(nrow = length(fuzzy1$interpolate), ncol = 2))
+    names(matriz.previsao) = c("obs", "forecast")
+    matriz.previsao$obs = time_series
+    matriz.previsao$forecast = fuzzy1$interpolate 
+    matriz.previsao = na.omit(matriz.previsao)
+    return(getMSE(matriz.previsao$obs, matriz.previsao$forecast))  
+  }
+  # c() - C, n, w, pos_type
+  lower = c(0, 02, 02)
+  upper = c(1, 20, 10)
+  
+  GenSA <- GenSA(fn = fitnessGenSA,
+                 par = c(0.5, 11, 6),
+                 lower = lower, upper = upper, 
+                 control = list(max.call = 4000, 
+                                max.time=300, 
+                                maxit = 1000, 
+                                verbose = TRUE, 
+                                smooth = FALSE, 
+                                seed=-1, 
+                                nb.stop.improvement = 40,
+                                temperature = 10000))
+
+  C = GenSA$par[1]; n = round(GenSA$par[2], 0); w = round(GenSA$par[3], 0)  
+  result = c(C, n, w)
+  return(result)
+}
+
 # Calcula o modelo FuzzyTS
 getFuzzyTS = function(time_series, GAParameters){ #time_series = AirPassengers
 
@@ -46,8 +92,7 @@ getFuzzyTS = function(time_series, GAParameters){ #time_series = AirPassengers
   fuzzy1 = fuzzy.ts2(as.ts(time_series), 
                      C = GAParameters[1],
                      n = GAParameters[2],
-                     w = GAParameters[3],  
-                     type = type_alg[GAParameters[4]],
+                     w = GAParameters[3],
                      forecast = 1)
   return(fuzzy1$forecast)
 }
@@ -72,3 +117,5 @@ get1StepAheadFuzzyTS = function(train.set, test.set, GAParameters){
   
   return(fts_forecast_all)
 }
+
+
