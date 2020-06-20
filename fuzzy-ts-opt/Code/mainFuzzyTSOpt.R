@@ -14,8 +14,8 @@
   
   # Lendo dados
   # MATAL; PIBVI; POPAZ
-  names = ("IPCAB")
-  dados = read.csv("Data/IPCAB.csv", sep = ";"); head(dados)
+  names = ("PIBPC")
+  dados = read.csv("Data/PIBPC.csv", sep = ";"); head(dados)
   
   # Cria conjuntos de treinamento e teste
   tamanho_dados = length(dados$target)
