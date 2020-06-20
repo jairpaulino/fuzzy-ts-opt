@@ -1,0 +1,7 @@
+[1] "> ************** poaz1 **************"
+      fuzzy_sa fuzzy_gensa          arima             ets            ann
+MSE        NaN         NaN 608281.0489035 1064983.1169665 1046297.953789
+MAPE       NaN         NaN      1.2082105       0.9428761       1.258839
+NRMSE        0           0      0.5996085       0.7933906       0.669197
+  fuzzy_ga fuzzy_gensa arima  ets  ann
+1    56.35        0.14  0.42 0.09 0.42
