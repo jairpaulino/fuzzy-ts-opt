@@ -29,7 +29,8 @@ getOptGAParameters = function(){
            pcrossover = 0.9,
            pmutation = 0.1,
            popSize = 30,
-           maxiter = 30, 
+           maxiter = 1000,
+           run = 20,
            seed = 22)
   
   plot(GA)
@@ -77,7 +78,7 @@ getOptGenSAParameters = function(){
                                 verbose = TRUE, 
                                 smooth = FALSE, 
                                 seed=-1, 
-                                nb.stop.improvement = 40,
+                                nb.stop.improvement = 20,
                                 temperature = 10000))
 
   C = GenSA$par[1]; n = round(GenSA$par[2], 0); w = round(GenSA$par[3], 0)  
