@@ -51,7 +51,7 @@ getOptGenSAParameters = function(){
     ftsParameters$n = floor(parameters[2])
     ftsParameters$w = floor(parameters[3])
     
-    n = as.numeric(round(n, 0)); w = round(w, 0)
+    #n = as.numeric(round(n, 0)); w = round(w, 0)
     fuzzy1 = fuzzy.ts2(as.ts(time_series), 
                        C = ftsParameters$C, n =  ftsParameters$n, w = ftsParameters$w, 
                        type = "Abbasov-Mamedova", 
