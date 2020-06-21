@@ -5,6 +5,7 @@
   library(AnalyzeTS) #Analisa series temporais fuzzy STF
   library(GA)
   library(GenSA)
+  library(ggplot2)
   
   # Chamando funcoes externas
   source("Code/preProcessing.R")
@@ -13,10 +14,10 @@
   source("Code/otherModels.R")
   
   # Lendo dados
-  # MATAL; PIBVI; POPAZ
-  names = ("PIBPC")
-  dados = read.csv("Data/PIBPC.csv", sep = ";"); head(dados)
-  
+  # POPAZ; PIBVI; PIBPC; IGPOG
+  names = ("IGPOG")
+  dados = read.csv("Data/IGPOG.csv", sep = ";"); head(dados)
+
   # Cria conjuntos de treinamento e teste
   tamanho_dados = length(dados$target)
   percentual_train = 0.75
@@ -42,7 +43,7 @@
   begin_arima = proc.time()
   arima_model = getOptimalARIMA(train.set)
   arima_forecast = getARIMAForecasts(test.set, arima_model)
-  end_arima = proc.time(); tempo_proc_arima= end_arima - begin_arima
+  end_arima = proc.time(); tempo_proc_arima = end_arima - begin_arima
   
   # Cria modelo ets e realizar previsao
   begin_ets = proc.time()
@@ -56,9 +57,11 @@
   ann_forecast = getANNForecasts(test.set, ann_model)
   end_ann = proc.time(); tempo_proc_ann= end_ann - begin_ann; tempo_proc_ann
   
+  test.set.index = dados$time[round((tamanho_dados*percentual_train+1)):tamanho_dados] 
   # Cria tabela com resultados
-  result_models = as.data.frame(matrix(nrow = length(test.set), ncol = 6))
-  names(result_models) = c("obs", "fuzzy_sa", "fuzzy_gensa", "arima", "ets", "ann") 
+  result_models = as.data.frame(matrix(nrow = length(test.set), ncol = 7))
+  names(result_models) = c("time", "obs", "fuzzy_sa", "fuzzy_gensa", "arima", "ets", "ann") 
+  result_models$time = test.set.index
   result_models$obs = test.set
   result_models$fuzzy_sa = fuzzy_forecast_ga 
   result_models$fuzzy_gensa  = fuzzy_forecast_gensa 
@@ -119,3 +122,34 @@
   result_models_metrics
   result_models_time
   sink()
+  
+  modelo = c("Valores observados", "FTS-GA", "FTS-SA", "ARIMA", "ETS", "RNA")
+  cor = c(6, 5, 4, 3, 2, 1) 
+  linha = c(1, 2, 3, 4, 5, 6)
+  
+  jpeg(filename = paste("Results/", names,".Complete_14.jpeg", sep=""), width = 7, height = 6, units = 'in', res = 300)
+  gp = ggplot(data = result_models, aes(x = time))
+  gp = gp + geom_line(aes(y = obs, color = modelo[1]), size = 1.5) 
+  gp = gp + geom_line(aes(y = fuzzy_sa, color = modelo[2]), size = 2, lty = linha[3])#, color = cor[2]) #color = "FTS-GA"
+  gp = gp + geom_line(aes(y = fuzzy_sa, color = modelo[2]))#, col = cor[2]) #color = "FTS-GA"
+  gp = gp + geom_line(aes(y = fuzzy_gensa, color = modelo[3]), size = 1.5, lty = linha[3])#, color = cor[3]) #color = "FTS-SA"
+  gp = gp + geom_line(aes(y = fuzzy_gensa, color = modelo[3]))#, color = cor[3]) #color = "FTS-GA"
+  gp = gp + geom_line(aes(y = arima, color = modelo[4]), size = 1.5, lty = linha[3])#, color = cor[4]) #color = "ARIMA"
+  gp = gp + geom_line(aes(y = arima, color = modelo[4]))#, color = cor[4]) #color = "FTS-GA"
+  gp = gp + geom_line(aes(y = ets, color = modelo[5]), size = 1.5, lty = linha[3])#, color = cor[5]) #color = "ETS"
+  gp = gp + geom_line(aes(y = ets, color = modelo[5]))#, color = cor[5]) #color = "FTS-GA"
+  gp = gp + geom_line(aes(y = ann, color = modelo[6]), size = 1.5, lty = linha[3])#, color = cor[6]) #color = "RNA"
+  gp = gp + geom_line(aes(y = ann, color = modelo[6]))#, color = cor[6])
+  
+  gp = gp + labs(x = "Data", y = paste(names)) + 
+    theme_bw() + 
+    theme(legend.position = "top") + 
+    scale_color_manual(values = cor) +
+    guides(color=guide_legend(title = NULL)) +
+    theme(legend.text=element_text(size=14))
+  
+  gp
+  dev.off()
+  
+  
+
