@@ -1,0 +1,7 @@
+[1] "> ************** IPGOG **************"
+      fuzzy_sa fuzzy_gensa arima ets ann
+MSE         NA          NA    NA  NA  NA
+MAPE        NA          NA    NA  NA  NA
+NRMSE       NA          NA    NA  NA  NA
+  fuzzy_ga fuzzy_gensa arima ets  ann
+1     0.06         0.1  0.01   0 0.02
