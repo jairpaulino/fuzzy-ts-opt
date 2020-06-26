@@ -15,8 +15,8 @@
   
   # Lendo dados
   # POPAZ; PIBVI; PIBPC; IGPOG
-  names = ("IGPOG")
-  dados = read.csv("Data/IGPOG.csv", sep = ";"); head(dados)
+  names = ("POPAZ")
+  dados = read.csv("Data/POPAZ.csv", sep = ";"); head(dados)
 
   # Cria conjuntos de treinamento e teste
   tamanho_dados = length(dados$target)
