@@ -1,59 +1,59 @@
-  rm(list = ls()) # Limpa dados
+rm(list = ls()) # Limpa dados
   
-  # Bibliotecas requeridas
-  library(forecast)
-  library(AnalyzeTS) #Analisa series temporais fuzzy STF
-  library(GA)
-  library(GenSA)
-  library(ggplot2)
+# Bibliotecas requeridas
+library(forecast)
+library(AnalyzeTS) #Analisa series temporais fuzzy STF
+library(GA)
+library(GenSA)
+library(ggplot2)
   
-  # Chamando funcoes externas
-  source("Code/preProcessing.R")
-  source("Code/fuzzyTS.R")
-  source("Code/performanceMetrics.R")
-  source("Code/otherModels.R")
+# Chamando funcoes externas
+source("Code/preProcessing.R")
+source("Code/fuzzyTS.R")
+source("Code/performanceMetrics.R")
+source("Code/otherModels.R")
   
-  # Lendo dados
-  # POPAZ; PIBVI; PIBPC; IGPOG
-  names = ("POPAZ")
-  dados = read.csv("Data/POPAZ.csv", sep = ";"); head(dados)
+# Lendo dados
+# POPAZ; PIBVI; PIBPC; IGPOG
+names = ("POPAZ")
+dados = read.csv("Data/POPAZ.csv", sep = ";"); head(dados)
 
-  # Cria conjuntos de treinamento e teste
-  tamanho_dados = length(dados$target)
-  percentual_train = 0.75
-  train.set = dados$target[1:round((tamanho_dados*percentual_train))] 
-  test.set = dados$target[round((tamanho_dados*percentual_train+1)):tamanho_dados] 
-  #plot.ts(train.set); plot.ts(test.set)
+# Cria conjuntos de treinamento e teste
+tamanho_dados = length(dados$target)
+percentual_train = 0.75
+train.set = dados$target[1:round((tamanho_dados*percentual_train))] 
+test.set = dados$target[round((tamanho_dados*percentual_train+1)):tamanho_dados] 
+#plot.ts(train.set); plot.ts(test.set)
   
-  # Calcula previsao 1-Step ahead para o modelo FTS - GA
-  begin_fuzzy_ga = proc.time()
-  GAParameters = getOptGAParameters()
-  fuzzy_forecast_ga = get1StepAheadFuzzyTS(train.set, test.set, GAParameters)
-  end_fuzzy_ga = proc.time()
-  tempo_proc_fuzzy_ga = end_fuzzy_ga - begin_fuzzy_ga
+# Calcula previsao 1-Step ahead para o modelo FTS - GA
+begin_fuzzy_ga = proc.time()
+GAParameters = getOptGAParameters()
+fuzzy_forecast_ga = get1StepAheadFuzzyTS(train.set, test.set, GAParameters)
+end_fuzzy_ga = proc.time()
+tempo_proc_fuzzy_ga = end_fuzzy_ga - begin_fuzzy_ga
+
+# Calcula previsao 1-Step ahead para o modelo FTS - GenSA
+begin_fuzzy_gensa = proc.time()
+GenSAParameters = getOptGenSAParameters()
+fuzzy_forecast_gensa = get1StepAheadFuzzyTS(train.set, test.set, GenSAParameters)
+end_fuzzy_gensa = proc.time(); 
+tempo_proc_fuzzy_gensa = end_fuzzy_gensa - begin_fuzzy_gensa 
   
-  # Calcula previsao 1-Step ahead para o modelo FTS - GenSA
-  begin_fuzzy_gensa = proc.time()
-  GenSAParameters = getOptGenSAParameters()
-  fuzzy_forecast_gensa = get1StepAheadFuzzyTS(train.set, test.set, GenSAParameters)
-  end_fuzzy_gensa = proc.time(); 
-  tempo_proc_fuzzy_gensa = end_fuzzy_gensa - begin_fuzzy_gensa 
+# Cria modelo arima e realizar previsao
+begin_arima = proc.time()
+arima_model = getOptimalARIMA(train.set)
+arima_forecast = getARIMAForecasts(test.set, arima_model)
+end_arima = proc.time(); tempo_proc_arima = end_arima - begin_arima
   
-  # Cria modelo arima e realizar previsao
-  begin_arima = proc.time()
-  arima_model = getOptimalARIMA(train.set)
-  arima_forecast = getARIMAForecasts(test.set, arima_model)
-  end_arima = proc.time(); tempo_proc_arima = end_arima - begin_arima
-  
-  # Cria modelo ets e realizar previsao
-  begin_ets = proc.time()
-  ets_model = getOptimalETS(train.set)
-  ets_forecast = getETSForecasts(test.set, ets_model)
-  end_ets = proc.time(); tempo_proc_ets= end_ets - begin_ets
-  
-  # Cria modelo ann e realizar previsao
-  begin_ann = proc.time()
-  ann_model = getOptimalANN(train.set)
+# Cria modelo ets e realizar previsao
+begin_ets = proc.time()
+ets_model = getOptimalETS(train.set)
+ets_forecast = getETSForecasts(test.set, ets_model)
+end_ets = proc.time(); tempo_proc_ets= end_ets - begin_ets
+
+# Cria modelo ann e realizar previsao
+begin_ann = proc.time()
+ann_model = getOptimalANN(train.set)
   ann_forecast = getANNForecasts(test.set, ann_model)
   end_ann = proc.time(); tempo_proc_ann= end_ann - begin_ann; tempo_proc_ann
   
