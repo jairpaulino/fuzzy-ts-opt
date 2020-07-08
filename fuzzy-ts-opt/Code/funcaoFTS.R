@@ -118,12 +118,12 @@ getfuzzification = function(time.series, D1, D2, n, C){
   time = min(time.series$time):max(time.series$time)
   
   Ai = 1:length(discourseUniverse[[1]]) #vetor de numeros inteiros
-  matrizDeAssociacao <- matrix(1:(length(discourseUniverse[[1]])*n), ncol = n) 
+  matrizFuzzy <- matrix(1:(length(discourseUniverse[[1]])*n), ncol = n) 
   for (i in 1:(length(discourseUniverse[[1]]))) {
     #temp = ""
     for (j in 1:n) {
       #At <- 1/(1 + (C * (ts.diff[i] - uim[j]))^2) #funcao de associacao (fuzzificacao)
-      matrizDeAssociacao[i,j] <- 1/(1 + (C * (discourseUniverse[[1]][i] - discourseUniverse[[2]][j, 4]))^2) #Gerando a matriz com os valores de associacao de cada variacao
+      matrizFuzzy[i,j] <- 1/(1 + (C * (discourseUniverse[[1]][i] - discourseUniverse[[2]][j, 4]))^2) #Gerando a matriz com os valores de associacao de cada variacao
       #arred.4 <- round2str(At, r = 4) #Arredondando e convertendo em sequencia de numeros para o n?mero especificado de casas decimais
       #At.j <- paste("(", arred.4, "/u", j, sep = "", ")") #usada para concatenar vetores convertendo-os em car?ter.
       #if (j == 1) 
@@ -135,24 +135,25 @@ getfuzzification = function(time.series, D1, D2, n, C){
   #fuzzification <- c(NA, Ai)
   #print(fuzzification)
  
-  rownames(matrizDeAssociacao) = as.numeric(c((min(time.series$time)+1):max(time.series$time))) 
-  colnames(matrizDeAssociacao) = discourseUniverse[[3]]
+  rownames(matrizFuzzy) = as.numeric(c((min(time.series$time)+1):max(time.series$time))) 
+  colnames(matrizFuzzy) = discourseUniverse[[3]]
 
-  return(matrizDeAssociacao)
+  return(matrizFuzzy)
 }
 
-# relationsMatrix = function(time.series, matrizDeAssociacao){ 
-#   
+# relationsMatrix = function(time.series, matrizFuzzy, w){
+# 
 #   ###Step_4.Calculation of the fuzzy relations matrix R(t)
-#   t <- 1990 #valor usado no paper para previs?o
+#   w=7
+#   t <- 2002 #valor usado no paper para previs?o
 #   O <- round(MATRIX[(t-w-1980):(t-2-1980),], 4) #matriz de opera??es
 #   K <- round(MATRIX[(t-1-1980),], 4) #matriz de crit?rios
 #   R <- O
-#   for (i in 1:(w-1)) 
+#   for (i in 1:(w-1))
 #     for (j in 1:n)
 #       if (O[i,j] > K[j])
 #         R[i,j] <- K[j] #matriz de rela??es nebulosas
-#   
+# 
 #   relationMatrix <- R
 # }
 
