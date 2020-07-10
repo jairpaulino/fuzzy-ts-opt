@@ -26,36 +26,37 @@ getDiscourseUniverse = function(time.series, D1, D2, n){
 } 
 
 # Step 2 - Fuzzification
-getfuzzification = function(time.series, D1, D2, n, C){
+getFuzzification = function(time.series, D1, D2, n, C){
   
   discourseUniverse = getDiscourseUniverse(time.series, D1, D2, n)
+  
   time = min(time.series$time):max(time.series$time)
   Ai = 1:length(discourseUniverse$diff)
-  matrizFuzzy <- matrix(1:(length(discourseUniverse$diff)*n), ncol = n) 
-  for (i in 1:(length(discourseUniverse[[1]]))) {
+  matrixFuzzy <- matrix(1:(length(discourseUniverse$diff)*n), ncol = n) 
+  for (i in 1:(length(discourseUniverse$diff))) {
      for (j in 1:n)
-      matrizFuzzy[i,j] <- 1/(1 + (C * (discourseUniverse$diff[i] - discourseUniverse$discourseUniverse[j, 4]))^2) #Gerando a matriz com os valores de associacao de cada variacao
-      rownames(matrizFuzzy) = as.numeric(c((min(time.series$time)+1):max(time.series$time))) 
-      colnames(matrizFuzzy) = discourseUniverse$U
+      matrixFuzzy[i,j] <- 1/(1 + (C * (discourseUniverse$diff[i] - discourseUniverse$discourseUniverse[j, 4]))^2) #Gerando a matriz com os valores de associacao de cada variacao
+      rownames(matrixFuzzy) = as.numeric(c((min(time.series$time)+1):max(time.series$time))) 
+      colnames(matrixFuzzy) = discourseUniverse$U
   }
   
   MF = NULL
-  MF$matrizFuzzy = matrizFuzzy
+  MF$matrixFuzzy = matrixFuzzy
   MF$middlePoint = discourseUniverse$middlePoint
   return(MF)
-  #return(list(matrizFuzzy, discourseUniverse$middlePoint))
+  #return(list(matrixFuzzy, discourseUniverse$middlePoint))
 }
 
 # Step x - 
-getRelationsMatrix = function(matrizFuzzy, time.series, w, n){
+getRelationsMatrix = function(matrixFuzzy, time.series, w, n){
 #w = 7; t = 2002
-#rownames(matrizFuzzy) <- as.numeric(c(1981:2001))
-#colnames(matrizFuzzy) <- c("u1","u2","u3","u4","u5","u6","u7")
+#rownames(matrixFuzzy) <- as.numeric(c(1981:2001))
+#colnames(matrixFuzzy) <- c("u1","u2","u3","u4","u5","u6","u7")
 #t <- 2002 #valor usado no paper para previsao; w=7; t=2002
-  matrizFuzzy = as.data.frame(matrizFuzzy)
-  tamanhoObservacoes = length(matrizFuzzy$u1)
-  O = matrizFuzzy[(tamanhoObservacoes-w+1):(tamanhoObservacoes-1),] #matriz de operacoes
-  K = matrizFuzzy[(tamanhoObservacoes),] #matriz de criterios
+  matrixFuzzy = as.data.frame(matrixFuzzy)
+  tamanhoObservacoes = length(matrixFuzzy$u1)
+  O = matrixFuzzy[(tamanhoObservacoes-w+1):(tamanhoObservacoes-1),] #matriz de operacoes
+  K = matrixFuzzy[(tamanhoObservacoes),] #matriz de criterios
   R = O #matriz de relacoes nebulosas
   for (i in 1:(w-1)){ #i=1; j=1
     for (j in 1:n){
@@ -70,16 +71,14 @@ getRelationsMatrix = function(matrizFuzzy, time.series, w, n){
   #write.csv2(table4, file = "RelationsMatrix", append = FALSE, sep = "\t", dec = ".",
            #row.names = TRUE, col.names = TRUE)
   RM = NULL
-  RM$R = R
+  RM$O = O
   RM$K = K
+  RM$R = R
   return(RM)
   #return(list(R, K))
 }
 
 #Step 4 - Deffuzification of fuzzy values
-
-#getRelationsMatrix = getRelationsMatrix(matrizFuzzy, time.series, w, t, n)
-
 getDefuzzificationAndForecasting = function(R, K, n, uim, timeSeries){
   Vi <- 1:n #vetor de numeros inteiros
   Ft <- NULL #K[[2]] #F(t) valor previsto para o ano t de forma difusa
@@ -89,6 +88,6 @@ getDefuzzificationAndForecasting = function(R, K, n, uim, timeSeries){
   Vi <- sum((Ft * uim)/sum(Ft)) #funcao de defuzzificacao
   #Vi <- round(Vi, 0)
   #print(Ft)
-  forecast = timeSeries$target[length(timeSeries$target)] + Vi
+  forecast = timeSeries[length(timeSeries)] + Vi
   return(forecast)
 }
