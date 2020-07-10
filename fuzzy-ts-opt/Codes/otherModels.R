@@ -27,5 +27,3 @@ getANNForecasts = function(test_set, model){
   onestep_ann = fitted(nnetar(test_set, model = model))
   return(onestep_ann)
 }
-
-
