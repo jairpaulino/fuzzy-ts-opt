@@ -8,12 +8,12 @@ library(forecast) #ARIMA, ETS e NNETAR
 #source("Codes/funcoesFTS.R")
 source("Codes/fuzzyTSOptGA_SA.R")
 source("Codes/performanceMetrics.R")
-source("Codes/optimalArimaETS.R")
+source("Codes/optimalArimaETS.RR")
 
 # PIBBV, LYNX, 
 # DEF, PIBPC, MATAL 
 # MUC, POPAZ, IGPOG, SUNY
-dados = read.csv("Data/ONI.csv", sep = ";"); tail(dados, 5)
+dados = read.csv("Data/SUNY.csv", sep = ";"); tail(dados, 5)
 
 data_train = dados$target[1:round((length(dados$target)*0.75))]
 data_test = dados$target[(round((length(dados$target)*0.75))+1):length(dados$target)]
@@ -29,7 +29,6 @@ nnar_model = getOptimalNNAR(data_train)
 onestep_arima = getARIMAForecasts(data_test, arima_model)
 onestep_ets = getETSForecasts(data_test, model = ets_model)
 onestep_nnar = getNNARForecasts(data_test, model = nnar_model)
-
 
 gaParameters = getOptGAParameters(data_train)
 teste = oneStepAheadForecasting(time.series = data_test,
