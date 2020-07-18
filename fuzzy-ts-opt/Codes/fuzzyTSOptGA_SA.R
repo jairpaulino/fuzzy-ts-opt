@@ -122,7 +122,7 @@ fitnessGA = function(D1, D2, C, n, w, time_series = data_train){
   
   n = round(n, 0); w = round(w, 0)
   D1 = round(D1, 0); D2 = round(D2, 0)
-  C = round(C, 0)
+  C = C
   
   forecast = oneStepAheadForecasting(time.series = time_series,
                                      D1 = D1, D2 = D2, n = n, w = w, C = C)
@@ -136,16 +136,16 @@ getOptGAParameters = function(data_train){
   
   amplitude = max(data_train) - min(data_train)
   # c() - D1, D2, C, n, w
-  lower = c(0             , 0             , 0, 02, 2)
-  upper = c(0.15*amplitude, 0.15*amplitude, 1, 50, round(length(data_train)*0.1, 0))
+  lower = c(0            , 0            , 0, 02, 2)
+  upper = c(0.2*amplitude, 0.2*amplitude, 1, 50, round(length(data_train)*0.1, 0))
   GA <- ga(type = "real-valued", 
            fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4], x[5]),
            lower = lower, upper = upper, 
-           pcrossover = 0.9,
-           pmutation = 0.1,
+           pcrossover = 0.85,
+           pmutation = 0.15,
            popSize = 10,
            maxiter = 1000,
-           run = 5,
+           run = 20,
            seed = 22)
   
   plot(GA)
