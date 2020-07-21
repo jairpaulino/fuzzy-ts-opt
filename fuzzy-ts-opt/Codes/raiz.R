@@ -16,7 +16,7 @@ source("Codes/optimalArimaETS.R")
 # PIBBV, LYNX, IGPOG
 # DEF, PIBPC, MATAL 
 # MUC, POPAZ, SUNY
-names = "PNVEIC"
+names = "ONI"
 dados = read.csv(paste("Data/", names, ".csv", sep=""), sep = ";"); tail(dados, 5)
 
 data_train = dados$target[1:round((length(dados$target)*0.75))]
