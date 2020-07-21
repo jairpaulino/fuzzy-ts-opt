@@ -1,12 +1,54 @@
+calculateMetrics = function(resultsMatrix){ #resultsMatrix = results
+  metricsMatrix = data.frame(matrix(nrow = (length(resultsMatrix)-1), ncol = 5))
+  rownames(metricsMatrix) = names(resultsMatrix)[2:5]
+  colnames(metricsMatrix) = c('MSE', 'MAE', 'MAPE', 'ARV', 'THEIL')
+  resultsMatrixWONA = na.omit(resultsMatrix)
+  
+  for (i in 1:4) { #i=4
+    for (j in 1:5) {
+      if(j == 1){
+        metricsMatrix[i,j] = getMSE(resultsMatrix[[i+1]], resultsMatrix$OBS)
+      }
+      if(j == 2){
+        metricsMatrix[i,j] = getMAE(resultsMatrix[[i+1]], resultsMatrix$OBS)
+      }
+      if(j == 3){
+        metricsMatrix[i,j] = getMAPE(resultsMatrix[[i+1]], resultsMatrix$OBS)
+      }    
+      if(j == 4){
+        metricsMatrix[i,j] = getARV(resultsMatrix[[i+1]], resultsMatrix$OBS)
+      }
+      if(j == 5){
+        metricsMatrix[i,j] = getARV(resultsMatrixWONA[[i+1]], resultsMatrixWONA$OBS)
+      }
+    }
+  }
+
+# getMSE(onestep_ftsga, data_test) #FUZZY
+# getMSE(onestep_arima, data_test) #ARIMA
+# getMSE(onestep_ets, data_test) #ETS
+# getMSE(onestep_nnar, data_test) #NNETAR
+  
+  return(metricsMatrix)  
+}
+
+getMAE = function(target,forecast){ # target = a; forecast = b
+  values = na.omit(data.frame(target = target, forecast = forecast))
+  MAE = sum(abs(values$target - values$forecast))/length(values$target)
+  return(MAE)
+}
+
 getSE = function(target,forecast){
   SE=(target-forecast)^2
   return(SE)
 }
+
 getAPE = function(target,forecast){
   target[which(target==0)] = NA#1e-10*min(abs(target[target!=0]))
   APE=abs((target-forecast)/target)
   return(APE)  
 }
+
 getRV = function(target,forecast){
   n = length(target)
   meanT = numeric(n)
