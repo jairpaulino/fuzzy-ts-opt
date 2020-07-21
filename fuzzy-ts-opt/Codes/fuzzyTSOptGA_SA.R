@@ -1,4 +1,3 @@
-# Step 1 - Differentiation and Discourse Universe
 getDiscourseUniverse = function(time.series, D1, D2, n){ 
   #time.series=dados$target; D1=1800; D2=1100; n=7; C=0.0001
   #time.series = data_test; D1 = gaParameters[1]; D2 = gaParameters[2]
@@ -28,7 +27,6 @@ getDiscourseUniverse = function(time.series, D1, D2, n){
   #return(list(ts.diff, discourseUniverse, U, uim))
 } 
 
-# Step 2 - Fuzzification
 getFuzzification = function(time.series, D1, D2, n, C){
   
   discourseUniverse = getDiscourseUniverse(time.series, D1, D2, n)
