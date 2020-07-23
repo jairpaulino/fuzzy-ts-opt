@@ -108,8 +108,8 @@ oneStepAheadForecasting = function(time.series, D1, D2, n, w, C){
                                                             pos = i)
   }
   
-  plot.ts(time.series, ylim = c(min(time.series), max(time.series)*1.1))
-  lines(forecast, col = 2, lwd = 2)
+  #plot.ts(time.series, ylim = c(min(time.series), max(time.series)*1.1))
+  #lines(forecast, col = 2, lwd = 2)
   return(forecast)
 }
 
@@ -119,7 +119,7 @@ fitnessGA = function(D1, D2, C, n, w, time_series = data_train){
   #time_series = data_train; C = 0.01; n = 3; w = 2; D1 = 10; D2 = 20 
   
   n = round(n, 0); w = round(w, 0)
-  D1 = round(D1, 0); D2 = round(D2, 0)
+  D1 = D1; D2 = D2 #round(D1, 0); D2 = round(D2, 0)
   C = C
   
   forecast = oneStepAheadForecasting(time.series = time_series,
@@ -132,24 +132,37 @@ fitnessGA = function(D1, D2, C, n, w, time_series = data_train){
 getOptGAParameters = function(data_train){
   #time_series = train.set; C = 0.5; n = 5.3; w = 6
   
-  amplitude = max(data_train) - min(data_train)
+  if (length(data_train) <= 50) {
+    nMax = 30; popMax = 30; nRun = 20
+  } else {
+    if (length(data_train) <= 200){
+      nMax = 25; popMax = 20; nRun = 15
+    } else {
+      nMax = 20; popMax = 10; nRun = 10
+    }
+  }
+  
+  #amplitude = max(data_train) -min(data_train)
+  D1Max = abs(min(data_train)*0.3)
+  D2Max = abs(max(data_train)*0.3)
   # c() - D1, D2, C, n, w
-  lower = c(0            , 0            , 0, 02, 2)
-  upper = c(0.2*amplitude, 0.2*amplitude, 1, 50, round(length(data_train)*0.1, 0))
+  lower = c(0            , 0            , 0, 05, 2)
+  upper = c(D1Max, D2Max, 1, nMax, round(length(data_train)*0.1))
   GA <- ga(type = "real-valued", 
            fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4], x[5]),
            lower = lower, upper = upper, 
            pcrossover = 0.85,
            pmutation = 0.15,
-           popSize = 10,
-           maxiter = 1000,
-           run = 20,
+           popSize = popMax,
+           maxiter = 300,
+           run = nRun,
+           parallel = TRUE, 
            seed = 22)
   
   plot(GA)
   result = NULL
-  result$D1 = as.numeric(round(summary(GA)$solution[1,][1], 0))
-  result$D2 = as.numeric(round(summary(GA)$solution[1,][2], 0)) 
+  result$D1 = as.numeric((summary(GA)$solution[1,][1]))#, 0))
+  result$D2 = as.numeric((summary(GA)$solution[1,][2]))#, 0)) 
   result$C = as.numeric(summary(GA)$solution[1,][3])
   result$n = as.numeric(round(summary(GA)$solution[1,][4],0 ))
   result$w = as.numeric(round(summary(GA)$solution[1,][5], 0))
