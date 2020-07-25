@@ -1,6 +1,12 @@
 getOptimalARIMA = function(training_test){
+  procTimeBegin = proc.time()
   arima_model = auto.arima(training_test, ic = 'bic', nmodels = 5000)
-  return(arima_model)
+  procTime = proc.time() - procTimeBegin
+  
+  rtrn = NULL
+  rtrn$model = arima_model
+  rtrn$procTime = procTime
+  return(rtrn)
 }
 
 getARIMAForecasts = function(test_set, model){
@@ -11,8 +17,13 @@ getARIMAForecasts = function(test_set, model){
 }
 
 getOptimalETS = function(training_test){
+  procTimeBegin = proc.time()
   ets_model = ets(training_test, ic = 'bic')
-  return(ets_model)
+  procTime = proc.time() - procTimeBegin
+  rtrn = NULL
+  rtrn$model = ets_model
+  rtrn$procTime = procTime  
+  return(rtrn)
 }
 
 getETSForecasts = function(test_set, model){
@@ -23,8 +34,13 @@ getETSForecasts = function(test_set, model){
 }
 
 getOptimalNNAR = function(training_test){
+  procTimeBegin = proc.time()
   nnar_model = nnetar(training_test)
-  return(nnar_model)
+  procTime = proc.time() - procTimeBegin
+  rtrn = NULL
+  rtrn$model = nnar_model
+  rtrn$procTime = procTime
+  return(rtrn)
 }
 
 getNNARForecasts = function(test_set, model){

@@ -132,6 +132,8 @@ fitnessGA = function(D1, D2, C, n, w, time_series = data_train){
 getOptGAParameters = function(data_train){
   #time_series = train.set; C = 0.5; n = 5.3; w = 6
   
+  procTimeBegin = proc.time()
+  
   if (length(data_train) <= 50) {
     nMax = 30; popMax = 30; nRun = 20
   } else {
@@ -159,6 +161,7 @@ getOptGAParameters = function(data_train){
            parallel = TRUE, 
            seed = 22)
   
+  procTime = proc.time() - procTimeBegin
   plot(GA)
   result = NULL
   result$D1 = as.numeric((summary(GA)$solution[1,][1]))#, 0))
@@ -166,7 +169,7 @@ getOptGAParameters = function(data_train){
   result$C = as.numeric(summary(GA)$solution[1,][3])
   result$n = as.numeric(round(summary(GA)$solution[1,][4],0 ))
   result$w = as.numeric(round(summary(GA)$solution[1,][5], 0))
-  
+  result$procTime = procTime[3]
   return(result)
 }
 
