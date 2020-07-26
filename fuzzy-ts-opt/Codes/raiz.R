@@ -12,8 +12,8 @@ source("Codes/performanceMetrics.R")
 source("Codes/optimalArimaETS.R")
 
 # MATAL, POPAZ, PIBPC, IGPOG, DEFOR
-# PIBBV, LYNX, SUNY, MUC, PNVEIC
-names = "DEFOR"
+# PIBBV, LYNX, SUNY, MUC, PNVEI
+names = "PNVEI"
 dados = read.csv(paste("Data/", names[1], ".csv", sep=""), sep = ";"); tail(dados, 5)
 
 # Phase 01 - Preprocessing ----
@@ -74,7 +74,6 @@ procTime$FTS_GA = gaParameters$procTime
 write.csv(procTime, file = paste("Results/", names, "_proctime", ".txt", sep=""))
 
 
-
 cor = c(1, "#32CD32", "#0000FF", "#1E90FF", 2) 
 linha = c(1, 2, 3, 4, 5, 6)
 simbolo = c(NA, 15, 16, 17, 18, 19)
@@ -82,7 +81,7 @@ legenda = c("Observed values", "ARIMA", "ETS", "NNAR", "FTS-GA")
 
 jpeg(filename = paste("Results/", names,"_onestep_teste.jpeg", sep=""), width = 7, height = 6, units = 'in', res = 300)
 plot.ts(results$OBS, lwd = 2, xlab = "Index (test set)", 
-        ylab = names, ylim = c(min(results), max(results)))
+        ylab = names, ylim = c(min(results)*0, max(results)*1.15))
 # ARIMA
 lines(results$ARIMA, lwd = 2, col = cor[2], lty = linha[2], pch = simbolo[2])
 points(results$ARIMA, col = cor[2], pch = simbolo[2])

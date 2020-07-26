@@ -2,7 +2,7 @@ calculateMetrics = function(resultsMatrix){ #resultsMatrix = results
   metricsMatrix = data.frame(matrix(nrow = (length(resultsMatrix)-1), ncol = 5))
   rownames(metricsMatrix) = names(resultsMatrix)[2:5]
   colnames(metricsMatrix) = c('MSE', 'MAE', 'MAPE', 'ARV', 'THEIL')
-  resultsMatrixWONA = na.omit(resultsMatrix)
+  #resultsMatrixWONA = na.omit(resultsMatrix)
   
   for (i in 1:4) { #i=4
     for (j in 1:5) {
@@ -19,7 +19,7 @@ calculateMetrics = function(resultsMatrix){ #resultsMatrix = results
         metricsMatrix[i,j] = getARV(resultsMatrix[[i+1]], resultsMatrix$OBS)
       }
       if(j == 5){
-        metricsMatrix[i,j] = getARV(resultsMatrixWONA[[i+1]], resultsMatrixWONA$OBS)
+        metricsMatrix[i,j] = getTheil(resultsMatrix[[i+1]], resultsMatrix$OBS)
       }
     }
   }
