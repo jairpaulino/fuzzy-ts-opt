@@ -149,7 +149,7 @@ getOptGAParameters = function(data_train){
   D2Max = abs(max(data_train)*0.3)
   # c() - D1, D2, C, n, w
   lower = c(0            , 0            , 0, 05, 2)
-  upper = c(D1Max, D2Max, 1, nMax, round(length(data_train)*0.1))
+  upper = c(D1Max, D2Max, 1, nMax, round(length(data_train)*0.2))
   GA <- ga(type = "real-valued", 
            fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4], x[5]),
            lower = lower, upper = upper, 
@@ -169,8 +169,79 @@ getOptGAParameters = function(data_train){
   result$C = as.numeric(summary(GA)$solution[1,][3])
   result$n = as.numeric(round(summary(GA)$solution[1,][4],0 ))
   result$w = as.numeric(round(summary(GA)$solution[1,][5], 0))
-  result$procTime = procTime[3]
+  result$procTime = as.numeric(procTime[3])
   return(result)
 }
 
 # SA ----
+fitnessSA = function(parameters, time_series = data_train){
+  
+  #time_series = data_train; C = 0.01; n = 3; w = 2; D1 = 10; D2 = 20 
+  ftsParameters = list()
+  ftsParameters$D1 = floor(parameters[1])
+  ftsParameters$D2 = floor(parameters[2])
+  ftsParameters$C = parameters[3]
+  ftsParameters$n = floor(parameters[4])
+  ftsParameters$w = floor(parameters[5])
+  
+  forecast = oneStepAheadForecasting(time.series = time_series,
+                                     D1 = ftsParameters$D1, 
+                                     D2 = ftsParameters$D2,
+                                     n = ftsParameters$n,
+                                     w = ftsParameters$w,
+                                     C = ftsParameters$C)
+  
+  return(getMSE(forecast, data_train))
+}
+
+
+# Calcula os parametros - GenSA
+getOptSAParameters = function(data_train){
+  #time_series = data_train; C = 0.5; n = 5.3; w = 6
+  
+  procTimeBegin = proc.time()
+  
+  if (length(data_train) <= 50) {
+    nRun = 20
+  } else {
+    if (length(data_train) <= 200){
+      nRun = 15
+    } else {
+      nRun = 10
+    }
+  }
+  
+  D1Max = abs(min(data_train)*0.3)
+  D2Max = abs(max(data_train)*0.3)
+
+  # c() - C, n, w, pos_type
+  lower = c(0    , 0,     0,   05, 2)
+  upper = c(D1Max, D2Max, 1, nMax, round(length(data_train)*0.2))
+  
+  GenSA <- GenSA(fn = fitnessSA,
+                 #par = c(0, 0, 0.5, 5, 1),
+                 lower = lower, upper = upper, 
+                 control = list(max.call = 4000, 
+                                max.time = 300, 
+                                maxit = 1000, 
+                                verbose = TRUE, 
+                                smooth = FALSE, 
+                                seed = 22, 
+                                nb.stop.improvement = nRun,
+                                temperature = 20000))
+  
+  procTime = proc.time() - procTimeBegin
+  
+  result = NULL
+  result$D1 = round(as.numeric(GenSA$par[1]), 0)
+  result$D2 = round(as.numeric(GenSA$par[2]), 0)
+  result$C = as.numeric(GenSA$par[3])
+  result$n = round(as.numeric(GenSA$par[4]), 0)
+  result$w = round(as.numeric(GenSA$par[5]), 0)
+  result$procTime = as.numeric(procTime[3])
+  
+  return(result)
+}
+  
+
+

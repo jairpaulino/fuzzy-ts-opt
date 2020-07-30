@@ -3,25 +3,23 @@ rm(list=ls())
 
 #install.packages("GA", dependencies = T)
 library(GA)
+#install.packages("GenSA", dependencies = T)
+library(GenSA)
 #install.packages("forecast", dependencies = T)
 library(forecast) #ARIMA, ETS e NNETAR
-library(ggplot2)
-#source("Codes/funcoesFTS.R")
+
 source("Codes/fuzzyTSOptGA_SA.R")
 source("Codes/performanceMetrics.R")
 source("Codes/optimalArimaETS.R")
 
 # MATAL, POPAZ, PIBPC, IGPOG, DEFOR
 # PIBBV, LYNX, SUNY, MUC, PNVEI
-names = "PNVEI"
+names = "PIBBV"
 dados = read.csv(paste("Data/", names[1], ".csv", sep=""), sep = ";"); tail(dados, 5)
 
 # Phase 01 - Preprocessing ----
-
 data_train = dados$target[1:round((length(dados$target)*0.75))]
 data_test = dados$target[(round((length(dados$target)*0.75))+1):length(dados$target)]
-nnetar(AirPassengers)
-
 
 # Phase 02 - Training (modelling) ----
 # Get optimal ARIMA, ETS, NNAR and FTS models 
@@ -29,7 +27,10 @@ arima_model = getOptimalARIMA(data_train)
 ets_model = getOptimalETS(data_train)
 nnar_model = getOptimalNNAR(data_train)
 gaParameters = getOptGAParameters(data_train)
+saParameters = getOptSAParameters(data_train)
+
 write.csv(gaParameters, file = paste("Results/", names, "_gaParameters",".txt", sep=""))
+write.csv(saParameters, file = paste("Results/", names, "_saParameters",".txt", sep=""))
 nnar_model$model$p+nnar_model$model$m
 
 # Phase 03 - Test (forecasting) ----
@@ -50,38 +51,49 @@ onestep_ftsga = oneStepAheadForecasting(time.series = ftsgaDataTest,
                                 n = as.numeric(gaParameters[4]),
                                w = as.numeric(gaParameters[5]))
 onestep_ftsga = as.numeric(na.omit(onestep_ftsga))
+#FTS-SA
+w = saParameters$w
+ftssaDataTest = c(data_train[(length(data_train)-w+1):length(data_train)], data_test)
+onestep_ftssa = oneStepAheadForecasting(time.series = ftssaDataTest,
+                                        D1 = as.numeric(saParameters[1]),
+                                        D2 = as.numeric(saParameters[2]),
+                                        C = as.numeric(saParameters[3]),
+                                        n = as.numeric(saParameters[4]),
+                                        w = as.numeric(saParameters[5]))
+onestep_ftssa = as.numeric(na.omit(onestep_ftssa))
 
-results = data.frame(matrix(nrow = length(data_test), ncol = 5))
-names(results) = c("OBS", "ARIMA", "ETS", "NNAR", "FTS_GA")
+results = data.frame(matrix(nrow = length(data_test), ncol = 6))
+names(results) = c("OBS", "ARIMA", "ETS", "NNAR", "FTS_GA", "FTS_SA")
 results$OBS = data_test
 results$ARIMA = onestep_arima
 results$ETS = onestep_ets
 results$NNAR = onestep_nnar
 results$FTS_GA = onestep_ftsga
+results$FTS_SA = onestep_ftssa
 write.csv(results, file = paste("Results/",names, "_onestep", ".txt", sep=""))
 
 # Phase 04 - Metrics and plots #####
 metrics = calculateMetrics(results)
 write.csv(metrics, file = paste("Results/", names, "_metrics",".txt", sep=""))
 
-procTime = as.data.frame(matrix(nrow = 1, ncol = 4))
-colnames(procTime) = c("ARIMA", "ETS", "NNAR", "FTS_GA")
+procTime = as.data.frame(matrix(nrow = 1, ncol = 5))
+colnames(procTime) = c("ARIMA", "ETS", "NNAR", "FTS_GA", "FTS_SA")
 rownames(procTime) = "procTime"
 procTime$ARIMA = arima_model$procTime[3]
 procTime$ETS = ets_model$procTime[3]
 procTime$NNAR = nnar_model$procTime[3]
 procTime$FTS_GA = gaParameters$procTime
+procTime$FTS_SA = saParameters$procTime
 write.csv(procTime, file = paste("Results/", names, "_proctime", ".txt", sep=""))
 
-
-cor = c(1, "#32CD32", "#0000FF", "#1E90FF", 2) 
-linha = c(1, 2, 3, 4, 5, 6)
-simbolo = c(NA, 15, 16, 17, 18, 19)
-legenda = c("Observed values", "ARIMA", "ETS", "NNAR", "FTS-GA")
+cor = c(1, "#32CD32", "#0000FF", "#1E90FF", 2, "#900C3F") 
+linha = c(1, 2, 3, 4, 5, 6, 7)
+simbolo = c(NA, 15, 16, 17, 18, 19, 20)
+legenda = c("Observed values", "ARIMA", "ETS", "NNAR", "FTS-GA", "FTS-SA")
 
 jpeg(filename = paste("Results/", names,"_onestep_teste.jpeg", sep=""), width = 7, height = 6, units = 'in', res = 300)
 plot.ts(results$OBS, lwd = 2, xlab = "Index (test set)", 
-        ylab = names, ylim = c(min(results)*0, max(results)*1.15))
+        ylab = names, ylim = c(min(results)*1, max(results)*1))
 # ARIMA
 lines(results$ARIMA, lwd = 2, col = cor[2], lty = linha[2], pch = simbolo[2])
 points(results$ARIMA, col = cor[2], pch = simbolo[2])
@@ -94,6 +106,10 @@ points(results$NNAR, col = cor[4], pch = simbolo[4])
 # FTS-GA
 lines(results$FTS_GA, lwd = 2, col = cor[5], lty = linha[5], pch = simbolo[5])
 points(results$FTS_GA, col = cor[5], pch = simbolo[5])
+# FTS-SA
+lines(results$FTS_SA, lwd = 2, col = cor[6], lty = linha[6], pch = simbolo[6])
+points(results$FTS_SA, col = cor[6], pch = simbolo[6])
+
 # legenda
 legend("topleft", legenda, col = cor, horiz = F,
        cex = 0.9, lty = linha, lwd = 2, border = T,

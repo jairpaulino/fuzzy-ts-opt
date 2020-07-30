@@ -1,10 +1,10 @@
 calculateMetrics = function(resultsMatrix){ #resultsMatrix = results
   metricsMatrix = data.frame(matrix(nrow = (length(resultsMatrix)-1), ncol = 5))
-  rownames(metricsMatrix) = names(resultsMatrix)[2:5]
+  rownames(metricsMatrix) = names(resultsMatrix)[2:(length(resultsMatrix))]
   colnames(metricsMatrix) = c('MSE', 'MAE', 'MAPE', 'ARV', 'THEIL')
   #resultsMatrixWONA = na.omit(resultsMatrix)
   
-  for (i in 1:4) { #i=4
+  for (i in 1:5) { #i=4
     for (j in 1:5) {
       if(j == 1){
         metricsMatrix[i,j] = getMSE(resultsMatrix[[i+1]], resultsMatrix$OBS)
