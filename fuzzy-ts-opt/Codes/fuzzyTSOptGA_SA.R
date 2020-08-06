@@ -202,21 +202,20 @@ getOptSAParameters = function(data_train){
   procTimeBegin = proc.time()
   
   if (length(data_train) <= 50) {
-    nRun = 20
+    nMax = 30; nRun = 20
   } else {
     if (length(data_train) <= 200){
-      nRun = 15
+      nMax = 25; nRun = 15
     } else {
-      nRun = 10
+      nMax = 20; nRun = 10
     }
   }
-  
   D1Max = abs(min(data_train)*0.3)
   D2Max = abs(max(data_train)*0.3)
 
   # c() - C, n, w, pos_type
-  lower = c(0    , 0,     0,   05, 2)
-  upper = c(D1Max, D2Max, 1, nMax, round(length(data_train)*0.2))
+  lower = c(0             , 0,     0,   05, 2)
+  upper = c(max(D1Max, 10), D2Max, 1, nMax, round(length(data_train)*0.2))
   
   GenSA <- GenSA(fn = fitnessSA,
                  #par = c(0, 0, 0.5, 5, 1),
