@@ -14,7 +14,7 @@ source("Codes/optimalArimaETS.R")
 
 # ENRAL, POPAZ, PIBPC, IGPOG, DEFOR
 # PIBBV, LYNX, SUNY, MUC, PNVEI
-names = "ENRAL"
+names = "SUNY"
 dados = read.csv(paste("Data/", names[1], ".csv", sep=""), sep = ";"); tail(dados, 5)
 
 # Phase 01 - Preprocessing ----
@@ -93,7 +93,7 @@ legenda = c("Observed values", "ARIMA", "ETS", "NNAR", "FTS-GA", "FTS-SA")
 
 jpeg(filename = paste("Results/", names,"_onestep_teste.jpeg", sep=""), width = 7, height = 6, units = 'in', res = 300)
 plot.ts(results$OBS, lwd = 2, xlab = "Index (test set)", 
-        ylab = names, ylim = c(min(results)*1, max(results)*1.1))
+        ylab = names, ylim = c(min(results)*1, max(results)*1))
 # ARIMA
 lines(results$ARIMA, lwd = 2, col = cor[2], lty = linha[2], pch = simbolo[2])
 points(results$ARIMA, col = cor[2], pch = simbolo[2])
@@ -116,7 +116,6 @@ legend("topleft", legenda, col = cor, horiz = F,
        bty = "o", pch = simbolo, inset = 0.01,
        bg = "white", box.col = "white")
 dev.off()
-
 
 #results$IND = 1:length(results[[1]])
 # gp = ggplot(data = results, aes(x = IND))

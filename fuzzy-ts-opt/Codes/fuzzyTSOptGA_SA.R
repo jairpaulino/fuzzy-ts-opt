@@ -134,16 +134,16 @@ getOptGAParameters = function(data_train){
   
   procTimeBegin = proc.time()
   
-  if (length(data_train) <= 50) {
-    nMax = 30; popMax = 30; nRun = 20
-  } else {
-    if (length(data_train) <= 200){
-      nMax = 25; popMax = 20; nRun = 15
-    } else {
-      nMax = 20; popMax = 10; nRun = 10
-    }
-  }
-  
+  # if (length(data_train) <= 50) {
+  #   nMax = 30; popMax = 30; nRun = 20
+  # } else {
+  #   if (length(data_train) <= 200){
+  #     nMax = 25; popMax = 20; nRun = 15
+  #   } else {
+  #     nMax = 20; popMax = 10; nRun = 10
+  #   }
+  # }
+  nMax = 20; popMax = 20; nRun = 20
   #amplitude = max(data_train) -min(data_train)
   D1Max = abs(min(data_train)*0.3)
   D2Max = abs(max(data_train)*0.3)
@@ -153,8 +153,8 @@ getOptGAParameters = function(data_train){
   GA <- ga(type = "real-valued", 
            fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4], x[5]),
            lower = lower, upper = upper, 
-           pcrossover = 0.85,
-           pmutation = 0.15,
+           pcrossover = 0.9,
+           pmutation = 0.05,
            popSize = popMax,
            maxiter = 300,
            run = nRun,
@@ -201,15 +201,18 @@ getOptSAParameters = function(data_train){
   
   procTimeBegin = proc.time()
   
-  if (length(data_train) <= 50) {
-    nMax = 30; nRun = 20
-  } else {
-    if (length(data_train) <= 200){
-      nMax = 25; nRun = 15
-    } else {
-      nMax = 20; nRun = 10
-    }
-  }
+  # if (length(data_train) <= 50) {
+  #   nMax = 30; nRun = 20
+  # } else {
+  #   if (length(data_train) <= 200){
+  #     nMax = 25; nRun = 15
+  #   } else {
+  #     nMax = 20; nRun = 10
+  #   }
+  # }
+  
+  nMax = 20; nRun = 20
+  
   D1Max = abs(min(data_train)*0.3)
   D2Max = abs(max(data_train)*0.3)
 
@@ -221,9 +224,9 @@ getOptSAParameters = function(data_train){
                  #par = c(0, 0, 0.5, 5, 1),
                  lower = lower, upper = upper, 
                  control = list(max.call = 4000, 
-                                max.time = 300, 
+                                max.time = 200, 
                                 maxit = 1000, 
-                                verbose = TRUE, 
+                                verbose = FALSE, 
                                 smooth = FALSE, 
                                 seed = 22, 
                                 nb.stop.improvement = nRun,
