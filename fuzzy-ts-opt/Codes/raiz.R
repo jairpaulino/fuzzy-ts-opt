@@ -89,12 +89,13 @@ write.csv(procTime, file = paste("Results/", names, "_proctime", ".txt", sep="")
 cor = c(1, "#32CD32", "#0000FF", "#1E90FF", 2, "#900C3F") 
 linha = c(1, 2, 3, 4, 5, 6, 7)
 simbolo = c(NA, 15, 16, 17, 18, 19, 20)
-legenda = c("Observed values", "ARIMA", "ETS", "NNAR", "FTS-GA", "FTS-SA")
+legenda = c("Observed values", "BJ", "ETS", "NNAR", "FTS-GA", "FTS-SA")
 
 jpeg(filename = paste("Results/", names,"_onestep_teste.jpeg", sep=""), width = 7, height = 6, units = 'in', res = 300)
 plot.ts(results$OBS, lwd = 2, xlab = "Index (test set)", 
-        ylab = names, ylim = c(min(results)*1, max(results)*1))
-# ARIMA
+        ylab = names, ylim = c(min(results)*1, 
+                               max(results)*1.1))
+# BJ
 lines(results$ARIMA, lwd = 2, col = cor[2], lty = linha[2], pch = simbolo[2])
 points(results$ARIMA, col = cor[2], pch = simbolo[2])
 # ETS
@@ -116,25 +117,4 @@ legend("topleft", legenda, col = cor, horiz = F,
        bty = "o", pch = simbolo, inset = 0.01,
        bg = "white", box.col = "white")
 dev.off()
-
-#results$IND = 1:length(results[[1]])
-# gp = ggplot(data = results, aes(x = IND))
-# gp = gp + geom_line(aes(y = OBS, color = modelo[1]), size = 1.5) 
-# gp = gp + geom_line(aes(y = ARIMA, color = modelo[4]), size = 1.5, lty = linha[3])#, color = cor[4]) #color = "ARIMA"
-# gp = gp + geom_line(aes(y = ARIMA, color = modelo[4]))#, color = cor[4]) #color = "FTS-GA"
-# gp = gp + geom_line(aes(y = ETS, color = modelo[5]), size = 1.5, lty = linha[3])#, color = cor[5]) #color = "ETS"
-# gp = gp + geom_line(aes(y = ETS, color = modelo[5]))#, color = cor[5]) #color = "FTS-GA"
-# gp = gp + geom_line(aes(y = NNAR, color = modelo[6]), size = 1.5, lty = linha[3])#, color = cor[6]) #color = "RNA"
-# gp = gp + geom_line(aes(y = NNAR, color = modelo[6]))#, color = cor[6])
-# gp = gp + geom_line(aes(y = FTS_GA, color = modelo[2]), size = 2, lty = linha[3])#, color = cor[2]) #color = "FTS-GA"
-# gp = gp + geom_line(aes(y = FTS_GA, color = modelo[2]))#, col = cor[2]) #color = "FTS-GA"
-# 
-# gp = gp + labs(x = "Index (test set)", y = paste(names)) + 
-#   theme_bw() + 
-#   theme(legend.position = "top") + 
-#   scale_color_manual(values = cor) +
-#   guides(color=guide_legend(title = NULL)) +
-#   theme(legend.text=element_text(size=14))
-# 
-# gp
 
