@@ -14,7 +14,7 @@ source("Codes/optimalArimaETS.R")
 
 # ENRAL, POPAZ, PIBPC, IGPOG, DEFOR
 # PIBBV, LYNX, SUNY, MUC, PNVEI
-names = "SUNY"
+names = "DEFOR"
 dados = read.csv(paste("Data/", names[1], ".csv", sep=""), sep = ";"); tail(dados, 5)
 
 # Phase 01 - Preprocessing ----
