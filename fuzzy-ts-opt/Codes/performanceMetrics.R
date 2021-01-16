@@ -4,7 +4,7 @@ calculateMetrics = function(resultsMatrix){ #resultsMatrix = results
   colnames(metricsMatrix) = c('MSE', 'MAE', 'MAPE', 'ARV', 'THEIL')
   #resultsMatrixWONA = na.omit(resultsMatrix)
   
-  for (i in 1:5) { #i=4
+  for (i in 1:4) { #i=4
     for (j in 1:5) {
       if(j == 1){
         metricsMatrix[i,j] = getMSE(resultsMatrix[[i+1]], resultsMatrix$OBS)

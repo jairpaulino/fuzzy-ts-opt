@@ -1,0 +1,73 @@
+\documentclass[preprint, review, 3p,times,12pt]{elsarticle}
+%Hlavacek
+
+%% Use the option review to obtain double line spacing
+%\documentclass[authoryear,preprint,review,12pt]{elsarticle}
+
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times]{elsarticle}
+%\documentclass[final,1p,times,twocolumn]{elsarticle}
+%% \documentclass[final,3p,times]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn]{elsarticle}
+%% \documentclass[final,5p,times]{elsarticle}
+%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+
+%% For including figures, graphicx.sty has been loaded in
+%% elsarticle.cls. If you prefer to use the old commands
+%% please give \usepackage{epsfig}
+%\usepackage{scalefnt}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage[]{algorithm2e}
+\usepackage{subcaption} 
+\usepackage{algorithmic}
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsthm package provides extended theorem environments
+%% \usepackage{amsthm}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers.
+\usepackage{lineno}
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+\epstopdfDeclareGraphicsRule{.tiff}{png}{.png}{convert #1 
+	OutputFile}
+\AppendGraphicsExtensions{.tiff}%
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\DeclareMathOperator*{\argmax}{arg\,max} % Jan 
+
+%\journal{Neural Networks}
+
+
+
+____
+
+\begin{algorithm}[H]
+\caption{FTS-GA}
+ Training set, popSize, pcrossover, pmutation, maxIter, nRun
+ FTS-GA model and parameters ($D1$, $D2$, $n$, $w$, and $C$)
+% \begin{algorithmic}[1]
+  Generate the initial population \;
+ \While{$i \leq maxIter$ and $consecutive rounds without improvement \leq nRun$}{
+  Fitness function calculation \;
+  Selection of the best individual (elitsm) \; 
+ Crossover \;
+ Mutation \;
+ }
+% \end{algorithmic}
+\label{alg:ftaga}
+\end{algorithm}
