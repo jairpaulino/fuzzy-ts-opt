@@ -17,8 +17,9 @@ source("Codes/optimalArimaETS.R")
 # pe_covid_conf, pe_covid_conf_acu
 # pe_covid_death, pe_covid_death_acu
 # pe_covid_conf_m7, pe_covid_death_m7
+# C_679297720740
 
-names = "pe_covid_death_m7"
+names = "C_679297720740"
 dados = read.csv(paste("Data/", names[1], ".csv", sep=""), sep = ";"); 
 #View(dados)
 
@@ -30,12 +31,15 @@ m = length(data_train); n = length(data_test)
 data_all = dados$target
 #length(dados$target); length(data_train); length(data_test)
 
+oneStepAheadForecasting(time.series = data_all,
+                        D1 = 1, D2 = 1, n = 5, w = 2, C = 0.5)
+
+
 # Phase 02 - Training (modelling) ----
 # Get optimal ARIMA, ETS, NNAR and FTS models 
 arima_model = getOptimalARIMA(data_train)
 ets_model = getOptimalETS(data_train)
-nnar_model = getOptimalNNAR(data_train)
-gaParameters = getOptGAParameters(data_train)
+gaParameters = getOptGAParameters(data_all) #data_train
 #saParameters = getOptSAParameters(data_train)
 
 write.csv(gaParameters, file = paste("Results/", names, "_gaParameters",".txt", sep=""))
