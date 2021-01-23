@@ -172,3 +172,58 @@ getOptGAParameters = function(data_train){
   result$procTime = as.numeric(procTime[3])
   return(result)
 }
+
+
+fitnessSA = function(parameters){
+  
+  series = data_train
+  
+  nnParameters = list()
+  nnParameters$D1 =   floor(parameters[1])#integer in [0, 13]
+  nnParameters$D2 =  floor(parameters[2])#integer in [0, 13]
+  nnParameters$C = parameters[3]#integer in [0, 13]
+  nnParameters$n = floor(parameters[4])#integer in [1, 15]
+  nnParameters$w = floor(parameters[5])#integer in [1, 15]
+  
+  forecast = oneStepAheadForecasting(series = series,
+                                     nnParameters = nnParameters)
+  
+  return(getMSE(forecast, data_train))
+}
+
+getOptSAParameters = function(series){
+  #series = data_all; C = 0.5; n = 5.3; w = 6
+  
+  procTimeBegin = proc.time()
+  
+  nMax = 20; popMax = 50; nRun = 20
+  D1Max = abs(min(data_train)*0.3)
+  D2Max = abs(max(data_train)*0.3)
+  
+  # c() - D1, D2, C, n, w
+  lower = c(0    , 0   ,  0.0001,   05,  2)
+  upper = c(D1Max, D2Max, 1, nMax, round(length(data_train)*0.2))
+  
+  SA = GenSA(lower = lower,
+             upper = upper,
+             fn = fitnessSA,
+             control = list(max.time = 100,
+                            nb.stop.improvement = 20, 
+                            temperature = 1000,
+                            verbose = T,
+                            seed = 123)
+  )
+  
+  procTime = proc.time() - procTimeBegin
+  
+  SA$par
+  
+  result = NULL
+  result$D1 = floor(SA$par[1])
+  result$D2 = floor(SA$par[2])#, 0)) 
+  result$C = SA$par[3]
+  result$n = floor(SA$par[4])
+  result$w = floor(SA$par[5])
+  result$procTime = as.numeric(procTime[3])
+  return(result)
+}
