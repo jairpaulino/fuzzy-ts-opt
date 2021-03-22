@@ -19,7 +19,7 @@ source("Codes/optimalArimaETS.R")
 # pe_covid_conf_m7, pe_covid_death_m7
 # C_679297720740
 
-names = "C_679297720740"
+names = "pe_covid_conf_m7"
 dados = read.csv(paste("Data/", names[1], ".csv", sep=""), sep = ";"); 
 #View(dados)
 
@@ -34,7 +34,6 @@ data_all = dados$target
 oneStepAheadForecasting(time.series = data_all,
                         D1 = 1, D2 = 1, n = 5, w = 2, C = 0.5)
 
-
 # Phase 02 - Training (modelling) ----
 # Get optimal ARIMA, ETS, NNAR and FTS models 
 arima_model = getOptimalARIMA(data_train)
@@ -44,13 +43,13 @@ gaParameters = getOptGAParameters(data_all) #data_train
 
 write.csv(gaParameters, file = paste("Results/", names, "_gaParameters",".txt", sep=""))
 #write.csv(saParameters, file = paste("Results/", names, "_saParameters",".txt", sep=""))
-nnar_model$model$p+nnar_model$model$m
+#nnar_model$model$p+nnar_model$model$m
 
 # Phase 03 - Test (forecasting) ----
 # One-step ahead approach#
 onestep_arima = getARIMAForecasts(data_all, arima_model$model)
 onestep_ets = getETSForecasts(data_all, model = ets_model$model)
-onestep_nnar = getNNARForecasts(data_all, model = nnar_model$model)
+#onestep_nnar = getNNARForecasts(data_all, model = nnar_model$model)
 
 #FTS-GA
 onestep_ftsga = oneStepAheadForecasting(time.series = data_all,
@@ -74,12 +73,12 @@ onestep_ftsga
 #                                         w = as.numeric(saParameters[5]))
 # onestep_ftssa = as.numeric(na.omit(onestep_ftssa))
 
-results = data.frame(matrix(nrow = length(data_all), ncol = 5))
-names(results) = c("OBS", "ARIMA", "ETS", "NNAR", "FTS_GA")#, "FTS_SA")
+results = data.frame(matrix(nrow = length(data_all), ncol = 4))
+names(results) = c("OBS", "ARIMA", "ETS", "FTS_GA")#, "FTS_GA")#, "FTS_SA")
 results$OBS = data_all
 results$ARIMA = onestep_arima
 results$ETS = onestep_ets
-results$NNAR = onestep_nnar
+#results$NNAR = onestep_nnar
 results$FTS_GA = onestep_ftsga
 #results$FTS_SA = onestep_ftssa
 write.csv(results, file = paste("Results/",names, "_onestep", ".txt", sep=""))
@@ -91,12 +90,12 @@ write.csv(metricsTrain, file = paste("Results/", names, "_metricsTrain",".txt", 
 write.csv(metricsTest, file = paste("Results/", names, "_metricsTest",".txt", sep=""))
 metricsTrain; metricsTest
 
-procTime = as.data.frame(matrix(nrow = 1, ncol = 4))
-colnames(procTime) = c("ARIMA", "ETS", "NNAR", "FTS_GA")
+procTime = as.data.frame(matrix(nrow = 1, ncol = 3))
+colnames(procTime) = c("ARIMA", "ETS", "FTS_GA")
 rownames(procTime) = "procTime"
 procTime$ARIMA = arima_model$procTime[3]
 procTime$ETS = ets_model$procTime[3]
-procTime$NNAR = nnar_model$procTime[3]
+#procTime$NNAR = nnar_model$procTime[3]
 procTime$FTS_GA = gaParameters$procTime
 #procTime$FTS_SA = saParameters$procTime
 write.csv(procTime, file = paste("Results/", names, "_proctime", ".txt", sep=""))
@@ -104,9 +103,9 @@ write.csv(procTime, file = paste("Results/", names, "_proctime", ".txt", sep="")
 cor = c(1, "#32CD32", "#0000FF", "#1E90FF", 2, "#900C3F") 
 linha = c(1, 2, 3, 4, 5, 6, 7)
 simbolo = c(NA, 15, 16, 17, 18, 19, 20)
-legenda = c("Observed values", "BJ", "ETS", "NNAR", "FTS-GA")#, "FTS-SA")
+legenda = c("Observed values", "BJ", "ETS", "FTS-GA")#, "FTS-SA")
 
-jpeg(filename = paste("Results/", names,"_onestep_all.jpeg", sep=""), width = 7, height = 6, units = 'in', res = 300)
+#jpeg(filename = paste("Results/", names,"_onestep_all.jpeg", sep=""), width = 7, height = 6, units = 'in', res = 300)
 plot.ts(results$OBS, lwd = 2, xlab = "Index", 
         ylab = names, ylim = c(min(na.omit(results)*0.9), 
                                max(na.omit(results))))
@@ -117,11 +116,11 @@ points(results$ARIMA, col = cor[2], pch = simbolo[2])
 lines(results$ETS, lwd = 2, col = cor[3], lty = linha[3], pch = simbolo[3])
 points(results$ETS, col = cor[3], pch = simbolo[3])
 # NNAR
-lines(results$NNAR, lwd = 2, col = cor[4], lty = linha[4], pch = simbolo[4])
-points(results$NNAR, col = cor[4], pch = simbolo[4])
+#lines(results$NNAR, lwd = 2, col = cor[4], lty = linha[4], pch = simbolo[4])
+#points(results$NNAR, col = cor[4], pch = simbolo[4])
 # FTS-GA
-lines(results$FTS_GA, lwd = 2, col = cor[5], lty = linha[5], pch = simbolo[5])
-points(results$FTS_GA, col = cor[5], pch = simbolo[5])
+lines(results$FTS_GA, lwd = 2, col = cor[4], lty = linha[4], pch = simbolo[4])
+points(results$FTS_GA, col = cor[4], pch = simbolo[4])
 # FTS-SA
 #lines(results$FTS_SA, lwd = 2, col = cor[6], lty = linha[6], pch = simbolo[6])
 #points(results$FTS_SA, col = cor[6], pch = simbolo[6])
@@ -131,7 +130,7 @@ legend("topleft", legenda, col = cor, horiz = F,
        cex = 0.9, lty = linha, lwd = 2, border = T,
        bty = "o", pch = simbolo, inset = 0.01,
        bg = "white", box.col = "white")
-dev.off()
+#dev.off()
 
 #Plot Test
 jpeg(filename = paste("Results/", names,"_onestep_test.jpeg", sep=""), width = 7, height = 6, units = 'in', res = 300)

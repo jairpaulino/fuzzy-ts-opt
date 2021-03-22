@@ -2,6 +2,7 @@ getDiscourseUniverse = function(time.series, D1, D2, n){
   #time.series=dados$target; D1=1800; D2=1100; n=7; C=0.0001
   #time.series = data_test; D1 = gaParameters[1]; D2 = gaParameters[2]
   #C = gaParameters[3]; n = gaParameters[4]; w = gaParameters[5]
+
   ts.diff <- as.vector(diff(time.series))
   Vmin <- min(ts.diff) - as.numeric(D1)
   Vmax <- max(ts.diff) + as.numeric(D2) 
@@ -148,8 +149,8 @@ getOptGAParameters = function(data_train){
   D1Max = abs(min(data_train)*0.3)
   D2Max = abs(max(data_train)*0.3)
   # c() - D1, D2, C, n, w
-  lower = c(0            , 0            , 0, 05, 2)
-  upper = c(D1Max, D2Max, 1, nMax, round(length(data_train)*0.2))
+  lower = c(0    , 0    , 0,   05, 2)
+  upper = c(D1Max, D2Max, 1, nMax, max(round(length(data_train)*0.2),3))
   GA <- ga(type = "real-valued", 
            fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4], x[5]),
            lower = lower, upper = upper, 
@@ -202,7 +203,7 @@ getOptSAParameters = function(series){
   
   # c() - D1, D2, C, n, w
   lower = c(0    , 0   ,  0.0001,   05,  2)
-  upper = c(D1Max, D2Max, 1, nMax, round(length(data_train)*0.2))
+  upper = c(D1Max, D2Max, 1, nMax, max(round(length(data_train)*0.2),3))
   
   SA = GenSA(lower = lower,
              upper = upper,
