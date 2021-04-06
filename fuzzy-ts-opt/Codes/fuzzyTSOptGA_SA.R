@@ -1,9 +1,9 @@
-getDiscourseUniverse = function(time.series, D1, D2, n){ 
-  #time.series=dados$target; D1=1800; D2=1100; n=7; C=0.0001
-  #time.series = data_test; D1 = gaParameters[1]; D2 = gaParameters[2]
+getDiscourseUniverse = function(series, D1, D2, n){ 
+  #series=dados$target; D1=1800; D2=1100; n=7; C=0.0001
+  #series = data_test; D1 = gaParameters[1]; D2 = gaParameters[2]
   #C = gaParameters[3]; n = gaParameters[4]; w = gaParameters[5]
 
-  ts.diff <- as.vector(diff(time.series))
+  ts.diff <- as.vector(diff(series))
   Vmin <- min(ts.diff) - as.numeric(D1)
   Vmax <- max(ts.diff) + as.numeric(D2) 
   n = as.numeric(n)
@@ -28,17 +28,17 @@ getDiscourseUniverse = function(time.series, D1, D2, n){
   #return(list(ts.diff, discourseUniverse, U, uim))
 } 
 
-getFuzzification = function(time.series, D1, D2, n, C){
+getFuzzification = function(series, D1, D2, n, C){
   
-  discourseUniverse = getDiscourseUniverse(time.series, D1, D2, n)
+  discourseUniverse = getDiscourseUniverse(series, D1, D2, n)
   
-  #time = min(time.series$time):max(time.series$time)
+  #time = min(series$time):max(series$time)
   Ai = 1:length(discourseUniverse$diff)
   matrixFuzzy <- matrix(1:(length(discourseUniverse$diff)*n), ncol = n) 
   for (i in 1:(length(discourseUniverse$diff))) {
     for (j in 1:n)
       matrixFuzzy[i,j] <- 1/(1 + (C * (discourseUniverse$diff[i] - discourseUniverse$discourseUniverse[j, 4]))^2) #Gerando a matriz com os valores de associacao de cada variacao
-    #rownames(matrixFuzzy) = as.numeric(c((min(time.series$time)+1):max(time.series$time))) 
+    #rownames(matrixFuzzy) = as.numeric(c((min(series$time)+1):max(series$time))) 
     colnames(matrixFuzzy) = discourseUniverse$U
   }
   
@@ -92,12 +92,12 @@ getDefuzzificationAndForecastingOneStep = function(R, K, n, uim, timeSeries, pos
   return(forecast)
 }
 
-oneStepAheadForecasting = function(time.series, D1, D2, n, w, C){ 
-  #time.series = dados$target; D1 = 1800; D2 = 1100; n = 7; w = 7; C = 0.1
-  model = getFuzzification(time.series, D1, D2, n, C)
+oneStepAheadForecasting = function(series, D1, D2, n, w, C){ 
+  #series = dados$target; D1 = 1800; D2 = 1100; n = 7; w = 7; C = 0.1
+  model = getFuzzification(series, D1, D2, n, C)
   
   forecast = NULL
-  for (i in w:(length(time.series)-1)){ #i=8
+  for (i in w:(length(series)-1)){ #i=8
     
     matrixFuzzyOneStep = model$matrixFuzzy[(i-w+1):(i),]
     
@@ -105,26 +105,65 @@ oneStepAheadForecasting = function(time.series, D1, D2, n, w, C){
                                         w = w, n = n)
     
     forecast[i+1] = getDefuzzificationAndForecastingOneStep(rm$R, rm$K, n = n, 
-                                                            model$middlePoint, timeSeries = time.series, 
+                                                            model$middlePoint, timeSeries = series, 
                                                             pos = i)
   }
   
-  #plot.ts(time.series, ylim = c(min(time.series), max(time.series)*1.1))
+  #plot.ts(series, ylim = c(min(series), max(series)*1.1))
+  #lines(forecast, col = 2, lwd = 2)
+  return(forecast)
+}
+
+oneStepAheadForecastingSA = function(series = series, parameters = parameters){ 
+  #series = dados$target
+  #parameters = list()
+  #parameters$D1 = 10; parameters$D2 = 10; 
+  #parameters$n = 5; parameters$C = 0.2
+  #parameters$w = 2
+  
+  #D1 = 1800; D2 = 1100; n = 7; w = 7; C = 0.1
+  model = getFuzzification(series = series, 
+                           D1 = parameters$D1,
+                           D2 = parameters$D2,
+                           n = parameters$n,
+                           C = parameters$C)
+  
+  forecast = NULL
+  for (i in parameters$w:(length(series)-1)){ #i=8
+    
+    matrixFuzzyOneStep = model$matrixFuzzy[(i-parameters$w+1):(i),]
+    
+    rm = getRelationsMatrixOneStepAhead(matrixFuzzy = matrixFuzzyOneStep, 
+                                        w = parameters$w, n = parameters$n)
+    
+    forecast[i+1] = getDefuzzificationAndForecastingOneStep(rm$R, rm$K, n = parameters$n, 
+                                                            model$middlePoint, timeSeries = series, 
+                                                            pos = i)
+  }
+  
+  #plot.ts(series, ylim = c(min(series), max(series)*1.1))
   #lines(forecast, col = 2, lwd = 2)
   return(forecast)
 }
 
 # GA ----
 # Cria funcao fitness - GA
-fitnessGA = function(D1, D2, C, n, w, time_series = data_train){
-  #time_series = data_train; C = 0.01; n = 3; w = 2; D1 = 10; D2 = 20 
+fitnessGA = function(D1, D2, n, w, C, series = data_train){
+  #series = data_train; parameters = c(10, 10, 5, 2, 0.01, 3)
   
-  n = round(n, 0); w = round(w, 0)
-  D1 = D1; D2 = D2 #round(D1, 0); D2 = round(D2, 0)
-  C = C
+  fuzzyParameters = list()
+  fuzzyParameters$D1 = parameters[1]
+  fuzzyParameters$D2 = parameters[2]
+  fuzzyParameters$n = floor(parameters[3])
+  fuzzyParameters$w = floor(parameters[4])
+  fuzzyParameters$C = parameters[5]
   
-  forecast = oneStepAheadForecasting(time.series = time_series,
-                                     D1 = D1, D2 = D2, n = n, w = w, C = C)
+  forecast = oneStepAheadForecastingSA(series = series,
+                                     D1 = fuzzyParameters$D1, 
+                                     D2 = fuzzyParameters$D2, 
+                                     n = fuzzyParameters$n, 
+                                     w = fuzzyParameters$w, 
+                                     C = fuzzyParameters$C)
   
   return(getMSE(forecast, data_train))
 }
@@ -152,7 +191,7 @@ getOptGAParameters = function(data_train){
   lower = c(0    , 0    , 0,   05, 2)
   upper = c(D1Max, D2Max, 1, nMax, max(round(length(data_train)*0.2),3))
   GA <- ga(type = "real-valued", 
-           fitness =  function(x) -fitnessGA (x[1], x[2], x[3], x[4], x[5]),
+           fitness =  function(x) -fitnessGA(x[1], x[2], x[3], x[4], x[5]),
            lower = lower, upper = upper, 
            pcrossover = 0.9,
            pmutation = 0.05,
@@ -175,19 +214,21 @@ getOptGAParameters = function(data_train){
 }
 
 
+# SA ----
+
 fitnessSA = function(parameters){
   
   series = data_train
   
-  nnParameters = list()
-  nnParameters$D1 =   floor(parameters[1])#integer in [0, 13]
-  nnParameters$D2 =  floor(parameters[2])#integer in [0, 13]
-  nnParameters$C = parameters[3]#integer in [0, 13]
-  nnParameters$n = floor(parameters[4])#integer in [1, 15]
-  nnParameters$w = floor(parameters[5])#integer in [1, 15]
+  fuzzyParameters = list()
+  fuzzyParameters$D1 = parameters[1] 
+  fuzzyParameters$D2 = parameters[2] 
+  fuzzyParameters$C = parameters[3] 
+  fuzzyParameters$n = floor(parameters[4])#integer in [1, 15]
+  fuzzyParameters$w = floor(parameters[5])#integer in [1, 15]
   
-  forecast = oneStepAheadForecasting(series = series,
-                                     nnParameters = nnParameters)
+  forecast = oneStepAheadForecastingSA(series = series,
+                                     parameters = fuzzyParameters)
   
   return(getMSE(forecast, data_train))
 }
