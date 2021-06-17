@@ -16,9 +16,9 @@ source("Codes/optimalArimaETS.R")
 # pe_covid_conf, pe_covid_conf_acu
 # pe_covid_death, pe_covid_death_acu
 # pe_covid_conf_m7, pe_covid_death_m7
-# C_679297720740
+# DPRODJU3
 
-names = "ENRAL"
+names = "POPAZ"
 dados = read.csv(paste("Data/", names[1], ".csv", sep=""), sep = ";"); 
 #View(dados)
 
@@ -37,7 +37,7 @@ ets_model = getOptimalETS(data_train)
 #gaParameters = getOptGAParameters(data_train) #data_train
 saParameters = getOptSAParameters(data_train)
 
-write.csv(gaParameters, file = paste("Results/", names, "_gaParameters",".txt", sep=""))
+write.csv(saParameters, file = paste("Results/", names, "_gaParameters",".txt", sep=""))
 #write.csv(saParameters, file = paste("Results/", names, "_saParameters",".txt", sep=""))
 #nnar_model$model$p+nnar_model$model$m
 
@@ -93,7 +93,7 @@ procTime$ETS = ets_model$procTime[3]
 procTime$FTS_SA = saParameters$procTime
 write.csv(procTime, file = paste("Results/", names, "_proctime", ".txt", sep=""))
 
-cor = c(1, "#32CD32", "#0000FF", "#1E90FF", 2, "#900C3F") 
+cor = c(1, "#32CD32", "#0000FF", "#900C3F") 
 linha = c(1, 2, 3, 4, 5, 6, 7)
 simbolo = c(NA, 15, 16, 17, 18, 19, 20)
 legenda = c("Observed values", "BJ", "ETS", "FTS-SA")#, "FTS-SA")
@@ -108,15 +108,9 @@ points(results$ARIMA, col = cor[2], pch = simbolo[2])
 # ETS
 lines(results$ETS, lwd = 2, col = cor[3], lty = linha[3], pch = simbolo[3])
 points(results$ETS, col = cor[3], pch = simbolo[3])
-# NNAR
-#lines(results$NNAR, lwd = 2, col = cor[4], lty = linha[4], pch = simbolo[4])
-#points(results$NNAR, col = cor[4], pch = simbolo[4])
-# FTS-GA
-#lines(results$FTS_SA, lwd = 2, col = cor[4], lty = linha[4], pch = simbolo[4])
-#points(results$FTS_SA, col = cor[4], pch = simbolo[4])
 # FTS-SA
-lines(results$FTS_SA, lwd = 2, col = cor[6], lty = linha[6], pch = simbolo[6])
-points(results$FTS_SA, col = cor[6], pch = simbolo[6])
+lines(results$FTS_SA, lwd = 2, col = cor[4], lty = linha[6], pch = simbolo[6])
+points(results$FTS_SA, col = cor[4], pch = simbolo[6])
 abline(v=(m+1), lty = 2, col = "gray", lwd = 2)
 # legenda
 legend("topleft", legenda, col = cor, horiz = F,

@@ -3,11 +3,11 @@ getDiscourseUniverse = function(series, D1, D2, n){
   #series = data_test; D1 = gaParameters[1]; D2 = gaParameters[2]
   #C = gaParameters[3]; n = gaParameters[4]; w = gaParameters[5]
 
-  ts.diff <- as.vector(diff(series))
-  Vmin <- min(ts.diff) - as.numeric(D1)
-  Vmax <- max(ts.diff) + as.numeric(D2) 
+  ts.diff = as.vector(diff(series))
+  Vmin = min(ts.diff) - as.numeric(D1)
+  Vmax = max(ts.diff) + as.numeric(D2) 
   n = as.numeric(n)
-  h <- (Vmax - Vmin)/n 
+  h = (Vmax - Vmin)/n 
   k = NULL; U = NULL
   k[1] = Vmin
   for (i in 2:(n + 1)) {
@@ -50,7 +50,7 @@ getFuzzification = function(series, D1, D2, n, C){
 }
 
 getRelationsMatrixOneStepAhead = function(matrixFuzzy, w, n){
-  #w = 7; i = 7
+  #w = 7; i = 11
   #matrixFuzzy = matrixFuzzyOneStep
   matrixFuzzy = as.data.frame(matrixFuzzy)
   tamanhoObservacoes = length(matrixFuzzy$u1)
@@ -80,39 +80,40 @@ getRelationsMatrixOneStepAhead = function(matrixFuzzy, w, n){
 
 getDefuzzificationAndForecastingOneStep = function(R, K, n, uim, timeSeries, pos){
   #R = rm$R; K = rm$K; n = n; uim =  model$middlePoint; timeSeries = dados$target
-  Vi <- 1:n #vetor de numeros inteiros
-  Ft <- NULL #K[[2]] #F(t) valor previsto para o ano t de forma difusa
+  Vi = 1:n  #vetor de numeros inteiros
+  Ft = NULL #K[[2]] #F(t) valor previsto para o ano t de forma difusa
   for (j in 1:n){
-    Ft[j] <- max(R[,j])
+    Ft[j] = max(R[,j])
   }
-  Vi <- sum((Ft * uim)/sum(Ft)) #funcao de defuzzificacao
+  Vi = sum((Ft * uim)/sum(Ft)) #funcao de defuzzificacao
   #Vi <- round(Vi, 0)
   #print(Ft)
-  forecast = timeSeries[pos+1] + Vi
+  forecast = timeSeries[pos+0] + Vi
+  #forecast = timeSeries[pos+1] + Vi
   return(forecast)
 }
 
-oneStepAheadForecasting = function(series, D1, D2, n, w, C){ 
-  #series = dados$target; D1 = 1800; D2 = 1100; n = 7; w = 7; C = 0.1
-  model = getFuzzification(series, D1, D2, n, C)
-  
-  forecast = NULL
-  for (i in w:(length(series)-1)){ #i=8
-    
-    matrixFuzzyOneStep = model$matrixFuzzy[(i-w+1):(i),]
-    
-    rm = getRelationsMatrixOneStepAhead(matrixFuzzy = matrixFuzzyOneStep, 
-                                        w = w, n = n)
-    
-    forecast[i+1] = getDefuzzificationAndForecastingOneStep(rm$R, rm$K, n = n, 
-                                                            model$middlePoint, timeSeries = series, 
-                                                            pos = i)
-  }
-  
-  #plot.ts(series, ylim = c(min(series), max(series)*1.1))
-  #lines(forecast, col = 2, lwd = 2)
-  return(forecast)
-}
+# oneStepAheadForecasting = function(series, D1, D2, n, w, C){ 
+#   #series = dados$target; D1 = 1800; D2 = 1100; n = 7; w = 7; C = 0.1
+#   model = getFuzzification(series, D1, D2, n, C)
+#   
+#   forecast = NULL
+#   for (i in (w):(length(series)-2)){#i=1
+#     
+#     matrixFuzzyOneStep = model$matrixFuzzy[(i-w+1):(i),]
+#     
+#     rm = getRelationsMatrixOneStepAhead(matrixFuzzy = matrixFuzzyOneStep, 
+#                                         w = w, n = n)
+#     
+#     forecast[i+2] = getDefuzzificationAndForecastingOneStep(rm$R, rm$K, n = n, 
+#                                                             model$middlePoint, timeSeries = series, 
+#                                                             pos = i)
+#   }
+#   
+#   #plot.ts(series, ylim = c(min(series), max(series)*1.1))
+#   #lines(forecast, col = 2, lwd = 2)
+#   return(forecast)
+# }
 
 oneStepAheadForecastingSA = function(series = series, parameters = parameters){ 
   #series = dados$target
@@ -129,7 +130,7 @@ oneStepAheadForecastingSA = function(series = series, parameters = parameters){
                            C = parameters$C)
   
   forecast = NULL
-  for (i in parameters$w:(length(series)-1)){ #i=8
+  for (i in (parameters$w+1):(length(series)-1)){ #i=8
     
     matrixFuzzyOneStep = model$matrixFuzzy[(i-parameters$w+1):(i),]
     
@@ -188,7 +189,7 @@ getOptGAParameters = function(data_train){
   D1Max = abs(min(data_train)*0.3)
   D2Max = abs(max(data_train)*0.3)
   # c() - D1, D2, C, n, w
-  lower = c(0    , 0    , 0,   05, 2)
+  lower = c(0    , 0    , 0,   02, 2)
   upper = c(D1Max, D2Max, 1, nMax, max(round(length(data_train)*0.2),3))
   GA <- ga(type = "real-valued", 
            fitness =  function(x) -fitnessGA(x[1], x[2], x[3], x[4], x[5]),
@@ -238,20 +239,19 @@ getOptSAParameters = function(series){
   
   procTimeBegin = proc.time()
   
-  nMax = 20; popMax = 50; nRun = 20
-  D1Max = abs(min(data_train)*0.3)
-  D2Max = abs(max(data_train)*0.3)
+  nMax = 50; nRun = 20
+  D1Max = abs(min(data_train)*0.2)
+  D2Max = abs(max(data_train)*0.2)
   
-  # c() - D1, D2, C, n, w
-  lower = c(0    , 0   ,  0.0001,   05,  2)
-  upper = c(D1Max, D2Max, 1, nMax, max(round(length(data_train)*0.2),3))
+  lower = c(0    , 0    ,  0.0001,   02, 2)
+  upper = c(D1Max, D2Max,       1, nMax, max(round(length(data_train)*0.2),3))
   
   SA = GenSA(lower = lower,
              upper = upper,
              fn = fitnessSA,
              control = list(max.time = 100,
-                            nb.stop.improvement = 20, 
-                            temperature = 1000,
+                            nb.stop.improvement = 30, 
+                            temperature = 10000,
                             verbose = T,
                             seed = 123)
   )
